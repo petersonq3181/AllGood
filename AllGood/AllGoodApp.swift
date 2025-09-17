@@ -6,12 +6,20 @@
 //
 
 import SwiftUI
+import FirebaseCore
+import FirebaseFirestore
 
 @main
 struct AllGoodApp: App {
+    init() {
+        FirebaseApp.configure()
+    }
+
+    @StateObject private var authViewModel = AuthenticationViewModel()
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView(authViewModel: authViewModel)
         }
     }
 }

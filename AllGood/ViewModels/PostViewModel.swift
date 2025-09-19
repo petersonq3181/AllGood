@@ -15,7 +15,11 @@ class PostViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
     
-    private let postManager = PostManager()
+    private let postManager: PostManager
+    
+    init(postManager: PostManager) {
+        self.postManager = postManager
+    }
     
     func loadUserPosts(userId: String) {
         Task {
@@ -47,8 +51,8 @@ class PostViewModel: ObservableObject {
 }
 
 class MockPostViewModel: PostViewModel {
-    override init() {
-        super.init()
+    init() {
+        super.init(postManager: PostManager()) // or MockPostManager
         self.posts = Post.mockPosts
     }
 }

@@ -28,12 +28,14 @@ struct Post: Codable, Identifiable {
     let description: String
     
     init(
+        id: String? = nil,
         userId: String,
         userName: String,
         type: PostType,
         location: GeoPoint,
         description: String
     ) {
+        self.id = id 
         self.userId = userId
         self.userName = userName
         self.type = type
@@ -48,12 +50,14 @@ struct Post: Codable, Identifiable {
 extension Post {
     static var mockPosts: [Post] {
         [
-            Post(userId: "123",
+            Post(id: "mock1",
+                 userId: "123",
                  userName: "anon",
                  type: .donation,
                  location: GeoPoint(latitude: 33.2, longitude: -117.25),
                  description: "A batch of chicken pot pie delivered across the county ..."),
-            Post(userId: "123",
+            Post(id: "mock2",
+                 userId: "123",
                  userName: "anon",
                  type: .donation,
                  location: GeoPoint(latitude: 33.2, longitude: -117.25),

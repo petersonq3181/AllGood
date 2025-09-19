@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
-    @StateObject private var postViewModel = PostViewModel()
+    @ObservedObject var postViewModel: PostViewModel
     
     var body: some View {
         NavigationView {
@@ -137,8 +137,8 @@ struct ProfileView: View {
     }
 }
 
-
 #Preview {
-    var authViewModel = AuthenticationViewModel()
-    ProfileView(authViewModel: authViewModel)
+    let authViewModel = AuthenticationViewModel()
+    let mockVM = MockPostViewModel()
+    ProfileView(authViewModel: authViewModel, postViewModel: mockVM)
 }

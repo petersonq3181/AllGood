@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct RootView: View {
-
-    @ObservedObject var authViewModel: AuthenticationViewModel
+    @StateObject private var postViewModel = PostViewModel(postManager: PostManager())
+    @ObservedObject var authViewModel = AuthenticationViewModel()
     
     var body: some View {
         Group {
@@ -21,7 +21,7 @@ struct RootView: View {
                             Text("Map")
                         }
                     
-                    ProfileView(authViewModel: authViewModel)
+                    ProfileView(authViewModel: authViewModel, postViewModel: postViewModel)
                         .tabItem {
                             Image(systemName: "person")
                             Text("Profile")

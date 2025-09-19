@@ -42,3 +42,23 @@ struct Post: Codable, Identifiable {
         self.description = description
     }
 }
+
+// makes sure mock code is only included in debug builds (not production)
+#if DEBUG
+extension Post {
+    static var mockPosts: [Post] {
+        [
+            Post(userId: "123",
+                 userName: "anon",
+                 type: .donation,
+                 location: GeoPoint(latitude: 33.2, longitude: -117.25),
+                 description: "A batch of chicken pot pie delivered across the county ..."),
+            Post(userId: "123",
+                 userName: "anon",
+                 type: .donation,
+                 location: GeoPoint(latitude: 33.2, longitude: -117.25),
+                 description: "A dollar donated at the grocery checkout")
+        ]
+    }
+}
+#endif

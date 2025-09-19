@@ -10,7 +10,7 @@ import Combine
 import FirebaseFirestore
 
 @MainActor
-final class PostViewModel: ObservableObject {
+class PostViewModel: ObservableObject {
     @Published var posts: [Post] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -43,5 +43,12 @@ final class PostViewModel: ObservableObject {
                 isLoading = false
             }
         }
+    }
+}
+
+class MockPostViewModel: PostViewModel {
+    override init() {
+        super.init()
+        self.posts = Post.mockPosts
     }
 }

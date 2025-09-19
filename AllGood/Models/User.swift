@@ -30,3 +30,13 @@ struct User: Codable {
         self.streakPostBest = streakPostBest
     }
 }
+
+// makes sure mock code is only included in debug builds (not production)
+#if DEBUG
+extension User {
+    static var mock: User {
+        User(uid: "123", isAnonymous: false, username: "anon",
+             streakApp: 9, streakAppBest: 9, streakPost: 3, streakPostBest: 5)
+    }
+}
+#endif

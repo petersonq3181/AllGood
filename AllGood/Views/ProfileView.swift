@@ -77,6 +77,49 @@ struct ProfileView: View {
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .center) // center horizontally
+                    
+                    // scrollable posts section
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            ForEach(postViewModel.posts) { post in
+                                HStack(alignment: .top, spacing: 30) {
+                                    // circle with first letter
+                                    Circle()
+                                        .stroke(Color.blue, lineWidth: 2)
+                                        .frame(width: 40, height: 40)
+                                        .overlay(
+                                            Text(post.userName.first.map { String($0).uppercased() } ?? "A")
+                                                .font(.headline)
+                                                .foregroundColor(.primary)
+                                        )
+                                    
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        // date
+                                        Text(post.timestamp, style: .date)
+                                            .font(.subheadline)
+                                            .foregroundColor(.primary)
+                                        
+                                        // description
+                                        Text(post.description)
+                                            .font(.body)
+                                            .foregroundColor(.primary)
+                                            .lineLimit(2)
+                                    }
+                                    
+                                    Spacer()
+                                }
+                                .padding()
+                                .background(Color.white)
+                                .cornerRadius(12)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.blue, lineWidth: 1)
+                                )
+                                .padding(.horizontal)
+                            }
+                        }
+                        .padding(.top, 12)
+                    }
                 }
                 
                 Spacer()
@@ -85,6 +128,11 @@ struct ProfileView: View {
             .background(Color(red: 0x1B/255, green: 0x28/255, blue: 0x2E/255)) // hex #1B282E
             .ignoresSafeArea() // cover behind nav bar
             .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                if let user = authViewModel.user {
+                    postViewModel.loadUserPosts(userId: user.uid)
+                }
+            }
         }
     }
 }

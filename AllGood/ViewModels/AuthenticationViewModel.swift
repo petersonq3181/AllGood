@@ -3,7 +3,7 @@ import FirebaseAuth
 import FirebaseFirestore
 
 @MainActor
-final class AuthenticationViewModel: ObservableObject {
+class AuthenticationViewModel: ObservableObject {
     @Published var user: User? = nil
     
     private let authManager = AuthenticationManager()
@@ -64,3 +64,17 @@ final class AuthenticationViewModel: ObservableObject {
         }
     }
 }
+
+#if DEBUG
+@MainActor
+final class MockAuthenticationViewModel: AuthenticationViewModel {
+    init(mockUser: User = .mock) {
+        super.init()
+        self.user = mockUser
+    }
+
+    // prevent hitting Firebase in previews/tests
+    override func loadCurrentUser() async { }
+    override func signOut() { self.user = nil }
+}
+#endif

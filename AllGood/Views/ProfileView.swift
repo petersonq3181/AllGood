@@ -52,7 +52,7 @@ struct ProfileView: View {
                             }
                             Text("App Streak")
                                 .foregroundColor(.white)
-                                .font(.subheadline)
+                                .font(.body)
                             Text("\(user.streakAppBest) best")
                                 .foregroundColor(.gray)
                                 .font(.caption)
@@ -70,7 +70,7 @@ struct ProfileView: View {
                             }
                             Text("Good Deed Streak")
                                 .foregroundColor(.white)
-                                .font(.subheadline)
+                                .font(.body)
                             Text("\(user.streakPostBest) best")
                                 .foregroundColor(.gray)
                                 .font(.caption)
@@ -85,7 +85,7 @@ struct ProfileView: View {
                                 HStack(alignment: .top, spacing: 30) {
                                     // circle with first letter
                                     Circle()
-                                        .stroke(Color.blue, lineWidth: 2)
+                                        .stroke(Color.black, lineWidth: 2)
                                         .frame(width: 40, height: 40)
                                         .overlay(
                                             Text(post.userName.first.map { String($0).uppercased() } ?? "A")
@@ -110,11 +110,12 @@ struct ProfileView: View {
                                 }
                                 .padding()
                                 .background(Color.white)
-                                .cornerRadius(12)
+                                .cornerRadius(10)
                                 .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.blue, lineWidth: 1)
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.blue, lineWidth: 2)
                                 )
+                                .frame(maxWidth: 325) // control tile width here
                                 .padding(.horizontal)
                             }
                         }
@@ -138,7 +139,8 @@ struct ProfileView: View {
 }
 
 #Preview {
-    let authViewModel = AuthenticationViewModel()
-    let mockVM = MockPostViewModel()
-    ProfileView(authViewModel: authViewModel, postViewModel: mockVM)
+    let mockAuthVM = MockAuthenticationViewModel()
+    let mockPostVM = MockPostViewModel()
+    
+    ProfileView(authViewModel: mockAuthVM, postViewModel: mockPostVM)
 }

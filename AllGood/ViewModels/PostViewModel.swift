@@ -50,9 +50,16 @@ class PostViewModel: ObservableObject {
     }
 }
 
-class MockPostViewModel: PostViewModel {
-    init() {
-        super.init(postManager: PostManager()) // or MockPostManager
-        self.posts = Post.mockPosts
+#if DEBUG
+final class MockPostViewModel: PostViewModel {
+    init(posts: [Post] = Post.mockPosts) {
+        // Don’t call Firestore-backed init, just inject a dummy manager
+        super.init(postManager: PostManager())
+        self.posts = posts
     }
+    
+    // Disable networking in previews
+    override func loadUserPosts(userId: String) { }
+    override func loadAllPosts() { }
 }
+#endif

@@ -27,7 +27,7 @@ final class AuthenticationManager {
             throw URLError(.badServerResponse)
         }
         
-        print("===== getAuthenticatedUser found user with id: \(user.uid)")
+        print("getAuthenticatedUser found user with id: \(user.uid)")
         
         return AuthDataResultModel(user: user)
     }
@@ -45,7 +45,7 @@ extension AuthenticationManager {
     func signInAnonymous() async throws -> AuthDataResultModel {
         let authDataResult = try await Auth.auth().signInAnonymously()
         
-        // Create user document in Firestore
+        // create user document in Firestore
         try await createUserDocument(uid: authDataResult.user.uid)
         
         return AuthDataResultModel(user: authDataResult.user)
@@ -56,9 +56,9 @@ extension AuthenticationManager {
         
         do {
             try db.collection("users").document(uid).setData(from: userDocument)
-            print("✅ Created user document in Firestore: \(uid)")
+            print("createUserDocument Created user document in Firestore: \(uid)")
         } catch {
-            print("❌ Failed to create user document: \(error)")
+            print("createUserDocument Failed to create user document: \(error)")
             throw error
         }
     }

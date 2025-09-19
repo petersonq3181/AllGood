@@ -18,18 +18,17 @@ final class AuthenticationViewModel: ObservableObject {
         do {
             let authDataResult = try authManager.getAuthenticatedUser()
             
-            // Fetch user document from Firestore
             await fetchUserDocument(uid: authDataResult.uid)
             
-            print("✅ Found existing user: \(authDataResult.uid)")
+            print("loadCurrentUser Found existing user: \(authDataResult.uid)")
         } catch {
-            // No user found → create anonymous account
+            // no user found --> create anonymous account
             do {
                 let authDataResult = try await authManager.signInAnonymous()
                 await fetchUserDocument(uid: authDataResult.uid)
-                print("🆕 Created anonymous user: \(authDataResult.uid)")
+                print("loadCurrentUser Created anonymous user: \(authDataResult.uid)")
             } catch {
-                print("❌ Failed to sign in anonymously: \(error)")
+                print("loadCurrentUser Failed to sign in anonymously: \(error)")
             }
         }
     }
@@ -40,19 +39,19 @@ final class AuthenticationViewModel: ObservableObject {
         do {
             let document = try await db.collection("users").document(uid).getDocument()
             if document.exists {
-                // User document exists, decode it
+                // user document exists, decode it
                 let user = try document.data(as: User.self)
                 self.user = user
-                print("✅ Fetched user document from Firestore: \(uid)")
+                print("fetchUserDocument Fetched user document from Firestore: \(uid)")
             } else {
-                // User document doesn't exist, create it
+                // user document doesn't exist, create it
                 let userDocument = AllGood.User(uid: uid, isAnonymous: true)
                 try db.collection("users").document(uid).setData(from: userDocument)
                 self.user = userDocument
-                print("✅ Created missing user document in Firestore: \(uid)")
+                print("fetchUserDocument Created missing user document in Firestore: \(uid)")
             }
         } catch {
-            print("❌ Failed to fetch/create user document: \(error)")
+            print("fetchUserDocument Failed to fetch/create user document: \(error)")
         }
     }
     
@@ -61,7 +60,7 @@ final class AuthenticationViewModel: ObservableObject {
             try authManager.signOut()
             self.user = nil
         } catch {
-            print("❌ Sign-out failed: \(error)")
+            print("signOut failed: \(error)")
         }
     }
 }

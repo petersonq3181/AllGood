@@ -30,7 +30,7 @@ final class PostManager {
         )
         
         let docRef = try db.collection(collection).addDocument(from: post)
-        print("✅ Post created successfully with ID: \(docRef.documentID)")
+        print("createPost Post created successfully with ID: \(docRef.documentID)")
         return docRef.documentID
     }
         
@@ -43,43 +43,29 @@ final class PostManager {
             try? document.data(as: Post.self)
         }
         
-        print("✅ Fetched \(posts.count) posts")
+        print("fetchAllPosts Fetched \(posts.count) posts")
         return posts
     }
     
     func fetchPostsByUser(userId: String) async throws -> [Post] {
-        
-        print("🔍 Fetching posts for user: \(userId)")
-
-
         let snapshot = try await db.collection(collection)
             .whereField("userId", isEqualTo: userId)
             .order(by: "timestamp", descending: true)
             .getDocuments()
-        
-        print("📄 Total docs in collection: \(snapshot.documents.count)")
-        for doc in snapshot.documents {
-            print("📂 Document \(doc.documentID): \(doc.data())")
-        }
 
-        for doc in snapshot.documents {
-            print("📂 Document \(doc.documentID): \(doc.data())")
-        }
-        
         let posts = snapshot.documents.compactMap { document in
             do {
                 return try document.data(as: Post.self)
             } catch {
-                print("❌ Failed to decode document \(document.documentID): \(error)")
+                print("fetchPostsByUser Failed to decode document \(document.documentID): \(error)")
                 return nil
             }
         }
         
-        print("✅ Fetched \(posts.count) posts for user: \(userId)")
+        print("fetchPostsByUser Fetched \(posts.count) posts for user: \(userId)")
         return posts
     }
     
-    /// Fetch posts by type
     func fetchPostsByType(_ type: PostType) async throws -> [Post] {
         let snapshot = try await db.collection(collection)
             .whereField("type", isEqualTo: type.rawValue)
@@ -90,21 +76,22 @@ final class PostManager {
             try? document.data(as: Post.self)
         }
         
-        print("✅ Fetched \(posts.count) posts of type: \(type.rawValue)")
+        print("fetchPostsByType Fetched \(posts.count) posts of type: \(type.rawValue)")
         return posts
     }
     
-    // MARK: - Helper Methods
+    // MARK: HELPERS
     
     private func calculateDistance(from: GeoPoint, to: GeoPoint) -> Double {
-        // Simplified distance calculation (in km)
-        // For production, use more accurate formulas
+        // simplified distance calculation (in km)
+        // for production, use more accurate formulas
         let lat1 = from.latitude
         let lon1 = from.longitude
         let lat2 = to.latitude
         let lon2 = to.longitude
         
-        let earthRadius = 6371.0 // Earth's radius in km
+        // Earth's radius in km
+        let earthRadius = 6371.0
         
         let dLat = (lat2 - lat1) * .pi / 180
         let dLon = (lon2 - lon1) * .pi / 180

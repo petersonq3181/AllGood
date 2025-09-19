@@ -11,7 +11,7 @@ import FirebaseFirestore
 enum PostType: String, CaseIterable, Codable {
     case donation
     case volunteering
-    case personalKindness = "personalKindness"
+    case kindness
     
     var displayName: String {
         return self.rawValue.capitalized

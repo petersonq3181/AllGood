@@ -44,25 +44,4 @@ final class PostViewModel: ObservableObject {
             }
         }
     }
-    
-    func createPost(
-        userId: String,
-        userName: String,
-        type: PostType,
-        location: GeoPoint,
-        description: String
-    ) async {
-        do {
-            let postId = try await postManager.createPost(
-                userId: userId,
-                userName: userName,
-                type: type,
-                location: location,
-                description: description
-            )
-            loadUserPosts(userId: userId) // Refresh the user's posts
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-    }
 }

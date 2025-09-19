@@ -14,13 +14,13 @@ struct ProfileView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                // User ID
+                // user ID
                 if let user = authViewModel.user {
                     Text("User ID: \(user.uid)")
                         .font(.headline)
                         .padding(.top, 20)
                     
-                    // Posts Section
+                    // posts section
                     VStack(spacing: 15) {
                         if postViewModel.isLoading {
                             Text("Loading posts...")

@@ -14,7 +14,19 @@ struct RootView: View {
     var body: some View {
         Group {
             if let user = authViewModel.user {
-                Text("Signed in as: \(user.uid)")
+                TabView {
+                    MapView()
+                        .tabItem {
+                            Image(systemName: "map")
+                            Text("Map")
+                        }
+                    
+                    ProfileView(authViewModel: authViewModel)
+                        .tabItem {
+                            Image(systemName: "person")
+                            Text("Profile")
+                        }
+                }
             } else {
                 ProgressView("Loading user...")
             }

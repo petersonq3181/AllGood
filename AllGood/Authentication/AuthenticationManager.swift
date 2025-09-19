@@ -55,7 +55,7 @@ extension AuthenticationManager {
         let userDocument = AllGood.User(uid: uid, isAnonymous: true)
         
         do {
-            try await db.collection("users").document(uid).setData(from: userDocument)
+            try db.collection("users").document(uid).setData(from: userDocument)
             print("✅ Created user document in Firestore: \(uid)")
         } catch {
             print("❌ Failed to create user document: \(error)")

@@ -4,7 +4,7 @@ import FirebaseFirestore
 
 @MainActor
 final class AuthenticationViewModel: ObservableObject {
-    @Published var user: AuthDataResultModel? = nil
+    @Published var user: User? = nil
     
     private let authManager = AuthenticationManager()
     
@@ -16,40 +16,43 @@ final class AuthenticationViewModel: ObservableObject {
     
     func loadCurrentUser() async {
         do {
-            let currentUser = try authManager.getAuthenticatedUser()
-            self.user = currentUser
+            let authDataResult = try authManager.getAuthenticatedUser()
             
-            // Check if user document exists in Firestore, create if not
-            await ensureUserDocumentExists(uid: currentUser.uid)
+            // Fetch user document from Firestore
+            await fetchUserDocument(uid: authDataResult.uid)
             
-            print("✅ Found existing user: \(currentUser.uid)")
+            print("✅ Found existing user: \(authDataResult.uid)")
         } catch {
             // No user found → create anonymous account
             do {
-                let newUser = try await authManager.signInAnonymous()
-                self.user = newUser
-                print("🆕 Created anonymous user: \(newUser.uid)")
+                let authDataResult = try await authManager.signInAnonymous()
+                await fetchUserDocument(uid: authDataResult.uid)
+                print("🆕 Created anonymous user: \(authDataResult.uid)")
             } catch {
                 print("❌ Failed to sign in anonymously: \(error)")
             }
         }
     }
     
-    private func ensureUserDocumentExists(uid: String) async {
+    private func fetchUserDocument(uid: String) async {
         let db = Firestore.firestore()
         
         do {
             let document = try await db.collection("users").document(uid).getDocument()
-            if !document.exists {
+            if document.exists {
+                // User document exists, decode it
+                let user = try document.data(as: User.self)
+                self.user = user
+                print("✅ Fetched user document from Firestore: \(uid)")
+            } else {
                 // User document doesn't exist, create it
                 let userDocument = AllGood.User(uid: uid, isAnonymous: true)
-                try await db.collection("users").document(uid).setData(from: userDocument)
+                try db.collection("users").document(uid).setData(from: userDocument)
+                self.user = userDocument
                 print("✅ Created missing user document in Firestore: \(uid)")
-            } else {
-                print("✅ User document already exists in Firestore: \(uid)")
             }
         } catch {
-            print("❌ Failed to check/create user document: \(error)")
+            print("❌ Failed to fetch/create user document: \(error)")
         }
     }
     

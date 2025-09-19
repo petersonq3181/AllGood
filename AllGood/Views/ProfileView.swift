@@ -10,6 +10,7 @@ import SwiftUI
 struct ProfileView: View {
     @ObservedObject var authViewModel: AuthenticationViewModel
     @ObservedObject var postViewModel: PostViewModel
+    @Environment(\.colorTheme) var theme
     
     var body: some View {
         NavigationView {
@@ -44,7 +45,7 @@ struct ProfileView: View {
                         VStack(spacing: 6) {
                             HStack(spacing: 4) {
                                 Image(systemName: "bolt.fill")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(theme.tertiary)
                                 Text("\(user.streakApp)")
                                     .font(.title2)
                                     .fontWeight(.bold)
@@ -62,7 +63,7 @@ struct ProfileView: View {
                         VStack(spacing: 6) {
                             HStack(spacing: 4) {
                                 Image(systemName: "heart")
-                                    .foregroundColor(.red)
+                                    .foregroundColor(theme.primary)
                                 Text("\(user.streakPost)")
                                     .font(.title2)
                                     .fontWeight(.bold)
@@ -82,38 +83,41 @@ struct ProfileView: View {
                     ScrollView {
                         VStack(spacing: 16) {
                             ForEach(postViewModel.posts) { post in
-                                HStack(alignment: .top, spacing: 30) {
-                                    // circle with first letter
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 2)
-                                        .frame(width: 40, height: 40)
-                                        .overlay(
-                                            Text(post.userName.first.map { String($0).uppercased() } ?? "A")
-                                                .font(.headline)
-                                                .foregroundColor(.primary)
-                                        )
-                                    
-                                    VStack(alignment: .leading, spacing: 8) {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    HStack(alignment: .center, spacing: 16) {
+                                        // circle with first letter
+                                        Circle()
+                                            .stroke(theme.quaternary, lineWidth: 3)
+                                            .frame(width: 35, height: 35)
+                                            .overlay(
+                                                Text(post.userName.first.map { String($0).uppercased() } ?? "A")
+                                                    .font(.title2)
+                                                    .fontWeight(.bold)
+                                                    .foregroundColor(theme.quaternary)
+                                            )
+                                        
                                         // date
                                         Text(post.timestamp, style: .date)
                                             .font(.subheadline)
-                                            .foregroundColor(.primary)
-                                        
-                                        // description
-                                        Text(post.description)
-                                            .font(.body)
-                                            .foregroundColor(.primary)
-                                            .lineLimit(2)
+                                            .foregroundColor(.black)
+                                            
+                                        Spacer()
                                     }
                                     
-                                    Spacer()
+                                    // description
+                                    Text(post.description)
+                                        .font(.body)
+                                        .foregroundColor(theme.secondary)
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(3)
                                 }
-                                .padding()
+                                .padding(.horizontal, 22)   // more breathing room inside
+                                .padding(.vertical, 12)
                                 .background(Color.white)
                                 .cornerRadius(10)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.blue, lineWidth: 2)
+                                        .stroke(theme.tertiary, lineWidth: 3)
                                 )
                                 .frame(maxWidth: 325) // control tile width here
                                 .padding(.horizontal)
@@ -126,7 +130,7 @@ struct ProfileView: View {
                 Spacer()
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity) // expand to full screen
-            .background(Color(red: 0x1B/255, green: 0x28/255, blue: 0x2E/255)) // hex #1B282E
+            .background(Color(theme.secondary)) // hex #1B282E
             .ignoresSafeArea() // cover behind nav bar
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {

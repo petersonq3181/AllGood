@@ -22,6 +22,7 @@ struct RootView: View {
                         }
                     
                     ProfileView(authViewModel: authViewModel, postViewModel: postViewModel)
+                        .environment(\.colorTheme, ColorThemeA())
                         .tabItem {
                             Image(systemName: "person")
                             Text("Profile")

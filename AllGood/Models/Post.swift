@@ -35,7 +35,7 @@ struct Post: Codable, Identifiable {
         location: GeoPoint,
         description: String
     ) {
-        self.id = id 
+        self.id = id
         self.userId = userId
         self.userName = userName
         self.type = type
@@ -61,7 +61,7 @@ extension Post {
                  userName: "anon",
                  type: .donation,
                  location: GeoPoint(latitude: 33.2, longitude: -117.25),
-                 description: "A dollar donated at the grocery checkout")
+                 description: "A dollar donated at the grocery checkout at 3 PM on the day, despite the increased price in groceries, and even with the projection for higher inflation.")
         ]
     }
 }

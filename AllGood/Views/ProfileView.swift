@@ -13,80 +13,82 @@ struct ProfileView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                // user ID
+            VStack(spacing: 40) {
                 if let user = authViewModel.user {
-                    Text("User ID: \(user.uid)")
-                        .font(.headline)
-                        .padding(.top, 20)
+                    // profile Header
+                    HStack(spacing: 30) {
+                        // profile picture placeholder
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 80, height: 80)
+                            .overlay(
+                                Image(systemName: "person.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 40, height: 40)
+                                    .foregroundColor(.white)
+                            )
+                        
+                        // username
+                        Text("@\(user.username ?? "anonymous")")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                    }
+                    .frame(maxWidth: .infinity, alignment: .center) // center horizontally
+                    .padding(.top, 100) // push down a little from the top
                     
-                    // posts section
-                    VStack(spacing: 15) {
-                        if postViewModel.isLoading {
-                            Text("Loading posts...")
-                                .foregroundColor(.secondary)
-                        } else if let errorMessage = postViewModel.errorMessage {
-                            Text("Failed to load posts: \(errorMessage)")
-                                .foregroundColor(.red)
-                        } else if postViewModel.posts.isEmpty {
-                            Text("No posts yet")
-                                .foregroundColor(.secondary)
-                        } else {
-                            ScrollView {
-                                LazyVStack(spacing: 10) {
-                                    ForEach(postViewModel.posts) { post in
-                                        PostRowView(post: post)
-                                    }
-                                }
-                                .padding(.horizontal, 20)
+                    // streak section
+                    HStack(spacing: 40) {
+                        // app Streak
+                        VStack(spacing: 6) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "bolt.fill")
+                                    .foregroundColor(.blue)
+                                Text("\(user.streakApp)")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
                             }
+                            Text("App Streak")
+                                .foregroundColor(.white)
+                                .font(.subheadline)
+                            Text("\(user.streakAppBest) best")
+                                .foregroundColor(.gray)
+                                .font(.caption)
+                        }
+                        
+                        // good deed Streak
+                        VStack(spacing: 6) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "heart")
+                                    .foregroundColor(.red)
+                                Text("\(user.streakPost)")
+                                    .font(.title2)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.white)
+                            }
+                            Text("Good Deed Streak")
+                                .foregroundColor(.white)
+                                .font(.subheadline)
+                            Text("\(user.streakPostBest) best")
+                                .foregroundColor(.gray)
+                                .font(.caption)
                         }
                     }
-                    .onAppear {
-                        postViewModel.loadUserPosts(userId: user.uid)
-                    }
+                    .frame(maxWidth: .infinity, alignment: .center) // center horizontally
                 }
                 
                 Spacer()
             }
-            .navigationTitle("Profile")
+            .frame(maxWidth: .infinity, maxHeight: .infinity) // expand to full screen
+            .background(Color(red: 0x1B/255, green: 0x28/255, blue: 0x2E/255)) // hex #1B282E
+            .ignoresSafeArea() // cover behind nav bar
             .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
 
-struct PostRowView: View {
-    let post: Post
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(post.type.displayName)
-                    .font(.subheadline)
-                    .fontWeight(.medium)
-                    .foregroundColor(.blue)
-                
-                Spacer()
-                
-                Text(post.timestamp, style: .relative)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            Text(post.description)
-                .font(.body)
-                .foregroundColor(.primary)
-                .multilineTextAlignment(.leading)
-            
-            if !post.description.isEmpty {
-                Divider()
-            }
-        }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
-    }
-}
 
 #Preview {
     var authViewModel = AuthenticationViewModel()

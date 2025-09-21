@@ -32,13 +32,6 @@ struct RootView: View {
                         }
                 }
                 .tint(.white) // sets the selected tab color
-                .onAppear {
-                    let appearance = UITabBarAppearance()
-                    appearance.configureWithOpaqueBackground()
-                    appearance.backgroundColor = UIColor(theme.secondary)
-                    UITabBar.appearance().standardAppearance = appearance
-                    UITabBar.appearance().scrollEdgeAppearance = appearance
-                }
             } else {
                 ProgressView("Loading user...")
             }

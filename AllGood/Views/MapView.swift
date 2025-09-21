@@ -11,17 +11,24 @@ import MapKit
 struct MapView: View {
     @Environment(\.colorTheme) var theme
     
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194),
-        span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+    @State private var bounds = MapCameraBounds(
+        centerCoordinateBounds: MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 39.7392, longitude: -104.9903),
+            span: MKCoordinateSpan(latitudeDelta: 40, longitudeDelta: 40) 
+        ),
+        minimumDistance: nil,
+        maximumDistance: nil
     )
     
     var body: some View {
-        NavigationView {
-            Map(coordinateRegion: $region)
-                .ignoresSafeArea(.all, edges: .top) // extend whole screen and under the nav bar
-                .navigationBarTitleDisplayMode(.inline)
+        ZStack {
+            Map(bounds: bounds)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea(edges: .bottom)
         }
+        // attach this to the *content view* inside the tab
+        .toolbarBackground(Color(theme.secondary), for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
     }
 }
 

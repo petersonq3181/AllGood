@@ -139,6 +139,9 @@ struct ProfileView: View {
                 }
             }
         }
+        // attach this to the *content view* inside the tab
+        .toolbarBackground(Color(theme.secondary), for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
     }
 }
 

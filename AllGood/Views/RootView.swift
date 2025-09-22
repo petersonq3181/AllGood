@@ -17,7 +17,7 @@ struct RootView: View {
         Group {
             if let user = authViewModel.user {
                 TabView {
-                    MapView()
+                    MapView(authViewModel: authViewModel, postViewModel: postViewModel)
                         .environment(\.colorTheme, theme)
                         .tabItem {
                             Image(systemName: "map")

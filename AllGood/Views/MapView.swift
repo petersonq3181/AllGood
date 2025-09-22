@@ -7,10 +7,14 @@
 
 import SwiftUI
 import MapKit
+import FirebaseFirestore
 
 struct MapView: View {
     
     @Environment(\.colorTheme) var theme
+    
+    @ObservedObject var authViewModel: AuthenticationViewModel
+    @ObservedObject var postViewModel: PostViewModel
     
     @StateObject private var locationManager = LocationManager()
     @State private var showLocationDeniedAlert = false
@@ -27,7 +31,7 @@ struct MapView: View {
     @State private var bounds = MapCameraBounds(
         centerCoordinateBounds: MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 39.7392, longitude: -104.9903),
-            span: MKCoordinateSpan(latitudeDelta: 40, longitudeDelta: 40)
+            span: MKCoordinateSpan(latitudeDelta: 120, longitudeDelta: 360)
         ),
         minimumDistance: nil,
         maximumDistance: nil
@@ -39,144 +43,9 @@ struct MapView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea(edges: .bottom)
             
-            if !showNewPostForm {
-                // floating buttons (overlay)
-                VStack(spacing: 12) {
-                    Button(action: {
-                        print("Add tapped")
-                        showNewPostForm = true
-                    }) {
-                        Image(systemName: "plus")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.black.opacity(0.7))
-                            .clipShape(Circle())
-                            .shadow(radius: 5)
-                    }
-                    
-                    Button(action: {
-                        print("Filter tapped")
-                    }) {
-                        Image(systemName: "slider.horizontal.3")
-                            .font(.title)
-                            .foregroundColor(.white)
-                            .padding()
-                            .background(Color.black.opacity(0.7))
-                            .clipShape(Circle())
-                            .shadow(radius: 5)
-                    }
-                }
-                .padding(.top, 25)
-                .padding(.trailing, 25)
-            }
-            
-            // poppup new post form
-            if showNewPostForm {
-                ZStack {
-                    // background tap catcher
-                    Color.black.opacity(0.3)
-                        .ignoresSafeArea()
-                        .onTapGesture {
-                            withAnimation {
-                                showNewPostForm = false
-                            }
-                        }
-                    
-                    VStack(spacing: 16) {
-                        // title
-                        Text("New Post")
-                            .font(.title2)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        
-                        // type dropdown
-                        Menu {
-                            ForEach(PostType.allCases, id: \.self) { type in
-                                Button(type.displayName) {
-                                    selectedType = type
-                                }
-                            }
-                        } label: {
-                            HStack {
-                                Text(selectedType?.displayName ?? "Type")
-                                    .foregroundColor(selectedType == nil ? .gray : .black)
-                                Spacer()
-                                Image(systemName: "chevron.down")
-                                    .foregroundColor(.gray)
-                            }
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(12)
-                        }
-                        
-                        // message field (z-stack hack to get placeholder text)
-                        ZStack(alignment: .topLeading) {
-                            if message.isEmpty {
-                                Text("Message...")
-                                    .foregroundColor(.gray)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 20)
-                            }
-                            
-                            TextEditor(text: $message)
-                                .padding(12)
-                                .opacity(message.isEmpty ? 0.01 : 1)
-                        }
-                        .frame(height: 100)
-                        .background(Color.white)
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.gray, lineWidth: 1)
-                        )
-                        
-                        Text("Posts to general area, not exact address")
-                            .font(.footnote)
-                            .foregroundColor(.gray)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
-                        
-                        // post button
-                        Button(action: {
-                            guard isFormValid else { return }
-                            
-                            switch locationManager.authorizationStatus {
-                            case .notDetermined:
-                                // first time: ask
-                                locationManager.requestAuthorization()
-                                locationManager.requestSingleLocation()
-                                
-                            case .authorizedWhenInUse, .authorizedAlways:
-                                // already granted: get location
-                                locationManager.requestSingleLocation()
-                                
-                            case .denied, .restricted, .none:
-                                // user denied: show alert
-                                showLocationDeniedAlert = true
-                            @unknown default:
-                                break
-                            }
-                        }) {
-                            Text("Post")
-                                .fontWeight(.semibold)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(isFormValid ? theme.primary : Color.gray.opacity(0.5))
-                                .foregroundColor(.white)
-                                .cornerRadius(25)
-                        }
-                        .padding(.top, 4)
-                        .frame(maxWidth: 160)
-                        .disabled(!isFormValid)
-                    }
-                    .padding(20)
-                    .background(theme.secondary)
-                    .cornerRadius(10)
-                    .shadow(radius: 8)
-                    .padding()
-                }
-            }
+            if !showNewPostForm { floatingButtons }
+
+            if showNewPostForm { newPostForm }
         }
         // attach this to the *content view* inside the tab
         .toolbarBackground(Color(theme.secondary), for: .tabBar)
@@ -199,8 +68,140 @@ struct MapView: View {
             withAnimation { showNewPostForm = false }
         }
     }
+    
+    private var floatingButtons: some View {
+        VStack(spacing: 12) {
+            Button(action: { showNewPostForm = true }) {
+                Image(systemName: "plus")
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.black.opacity(0.7))
+                    .clipShape(Circle())
+                    .shadow(radius: 5)
+            }
+            
+            Button(action: { print("Filter tapped") }) {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.title)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.black.opacity(0.7))
+                    .clipShape(Circle())
+                    .shadow(radius: 5)
+            }
+        }
+        .padding(.top, 25)
+        .padding(.trailing, 25)
+    }
+    
+    private var newPostForm: some View {
+        ZStack {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture { withAnimation { showNewPostForm = false } }
+            
+            VStack(spacing: 16) {
+                Text("New Post")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                typeDropdown
+                messageField
+                postLocationNote
+                postButton
+            }
+            .padding(20)
+            .background(theme.secondary)
+            .cornerRadius(10)
+            .shadow(radius: 8)
+            .padding()
+        }
+    }
+        
+    private var typeDropdown: some View {
+        Menu {
+            ForEach(PostType.allCases, id: \.self) { type in
+                Button(type.displayName) { selectedType = type }
+            }
+        } label: {
+            HStack {
+                Text(selectedType?.displayName ?? "Type")
+                    .foregroundColor(selectedType == nil ? .gray : .black)
+                Spacer()
+                Image(systemName: "chevron.down")
+                    .foregroundColor(.gray)
+            }
+            .padding()
+            .background(Color.white)
+            .cornerRadius(12)
+        }
+    }
+    
+    private var messageField: some View {
+        ZStack(alignment: .topLeading) {
+            if message.isEmpty {
+                Text("Message...")
+                    .foregroundColor(.gray)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 20)
+            }
+            TextEditor(text: $message)
+                .padding(12)
+                .opacity(message.isEmpty ? 0.01 : 1)
+        }
+        .frame(height: 100)
+        .background(Color.white)
+        .cornerRadius(12)
+        .overlay(RoundedRectangle(cornerRadius: 12)
+            .stroke(Color.gray, lineWidth: 1))
+    }
+        
+    private var postLocationNote: some View {
+        Text("Posts to general area, not exact address")
+            .font(.footnote)
+            .foregroundColor(.gray)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal)
+    }
+        
+    private var postButton: some View {
+        Button(action: handlePostButton) {
+            Text("Post")
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(isFormValid ? theme.primary : Color.gray.opacity(0.5))
+                .foregroundColor(.white)
+                .cornerRadius(25)
+        }
+        .padding(.top, 4)
+        .frame(maxWidth: 160)
+        .disabled(!isFormValid)
+    }
+        
+    private func handlePostButton() {
+        guard isFormValid else { return }
+        
+        switch locationManager.authorizationStatus {
+        case .notDetermined:
+            locationManager.requestAuthorization()
+            locationManager.requestSingleLocation()
+            
+        case .authorizedWhenInUse, .authorizedAlways:
+            locationManager.requestSingleLocation()
+            
+        case .denied, .restricted, .none:
+            showLocationDeniedAlert = true
+        @unknown default:
+            break
+        }
+    }
 }
 
 #Preview {
-    MapView()
+    let mockAuthVM = MockAuthenticationViewModel()
+    let mockPostVM = MockPostViewModel()
+    MapView(authViewModel: mockAuthVM, postViewModel: mockPostVM)
 }

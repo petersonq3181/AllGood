@@ -33,28 +33,27 @@ final class PostManager {
         let docRef = try db.collection(collection).addDocument(from: post)
         print("createPost Post created successfully with ID: \(docRef.documentID)")
         
-        // update user's last post date
+        // compute and update user's post streak and best in a single read-modify-write
         let userRef = db.collection("users").document(userId)
-        try await userRef.updateData([
-            "lastPost": Timestamp(date: Date())
-        ])
-        
-        // update user's post streak if necessary
         let now = Date()
         let snapshot = try await userRef.getDocument()
         guard let data = snapshot.data() else {
             throw NSError(domain: "CreatePost", code: 1, userInfo: [NSLocalizedDescriptionKey: "User document not found"])
         }
-        
         let lastPostTimestamp = data["lastPost"] as? Timestamp
         let lastPostDate = lastPostTimestamp?.dateValue() ?? Date.distantPast
-        let streakPost = data["streakPost"] as? Int ?? 0
-        
-        var updates: [String: Any] = ["lastPost": Timestamp(date: now)]
-        if now.timeIntervalSince(lastPostDate) <= 48 * 60 * 60 {
-            updates["streakPost"] = streakPost + 1
-        }
-        try await userRef.updateData(updates)
+        let currentStreakPost = data["streakPost"] as? Int ?? 0
+        let currentStreakPostBest = data["streakPostBest"] as? Int ?? 0
+
+        let within48h = now.timeIntervalSince(lastPostDate) <= 48 * 60 * 60
+        let newStreakPost = within48h ? currentStreakPost + 1 : 1
+        let newStreakPostBest = max(currentStreakPostBest, newStreakPost)
+
+        try await userRef.updateData([
+            "lastPost": Timestamp(date: now),
+            "streakPost": newStreakPost,
+            "streakPostBest": newStreakPostBest
+        ])
                 
         return docRef.documentID
     }

@@ -21,6 +21,7 @@ class AuthenticationViewModel: ObservableObject {
             let authDataResult = try authManager.getAuthenticatedUser()
             
             await fetchUserDocument(uid: authDataResult.uid)
+            await updateStreaksOnAppOpen(uid: authDataResult.uid)
             startUserDocumentListener(uid: authDataResult.uid)
             
             print("loadCurrentUser Found existing user: \(authDataResult.uid)")
@@ -29,6 +30,7 @@ class AuthenticationViewModel: ObservableObject {
             do {
                 let authDataResult = try await authManager.signInAnonymous()
                 await fetchUserDocument(uid: authDataResult.uid)
+                await updateStreaksOnAppOpen(uid: authDataResult.uid)
                 startUserDocumentListener(uid: authDataResult.uid)
                 print("loadCurrentUser Created anonymous user: \(authDataResult.uid)")
             } catch {
@@ -79,6 +81,59 @@ class AuthenticationViewModel: ObservableObject {
             } catch {
                 print("startUserDocumentListener decode error: \(error)")
             }
+        }
+    }
+
+    private func updateStreaksOnAppOpen(uid: String) async {
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(uid)
+        do {
+            let snapshot = try await userRef.getDocument()
+            guard let data = snapshot.data() else { return }
+            let now = Date()
+            let lastOpenDate = (data["lastOpen"] as? Timestamp)?.dateValue()
+            let lastPostDate = (data["lastPost"] as? Timestamp)?.dateValue() ?? Date.distantPast
+            let currentStreakApp = data["streakApp"] as? Int ?? 0
+            let currentStreakAppBest = data["streakAppBest"] as? Int ?? 0
+            let currentStreakPost = data["streakPost"] as? Int ?? 0
+
+            var updates: [String: Any] = [:]
+
+            // reset post streak if last post was more than 48h ago
+            if now.timeIntervalSince(lastPostDate) > 48 * 60 * 60 {
+                if currentStreakPost != 0 { updates["streakPost"] = 0 }
+            }
+
+            // app streak: increment at most once per calendar day
+            let calendar = Calendar.current
+            let newStreakApp: Int
+            if let lastOpenDate = lastOpenDate {
+                if calendar.isDate(now, inSameDayAs: lastOpenDate) {
+                    // same day: do not increment
+                    newStreakApp = max(1, currentStreakApp)
+                } else if now.timeIntervalSince(lastOpenDate) <= 48 * 60 * 60 {
+                    // different day, within 48h window: increment by 1
+                    newStreakApp = max(1, currentStreakApp + 1)
+                } else {
+                    // gap too long: reset to 1
+                    newStreakApp = 1
+                }
+            } else {
+                // first open we track
+                newStreakApp = 1
+            }
+            if newStreakApp != currentStreakApp { updates["streakApp"] = newStreakApp }
+            let newStreakAppBest = max(currentStreakAppBest, newStreakApp)
+            if newStreakAppBest != currentStreakAppBest { updates["streakAppBest"] = newStreakAppBest }
+
+            // always update lastOpen
+            updates["lastOpen"] = Timestamp(date: now)
+
+            if !updates.isEmpty {
+                try await userRef.updateData(updates)
+            }
+        } catch {
+            print("updateStreaksOnAppOpen error: \(error)")
         }
     }
     

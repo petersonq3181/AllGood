@@ -36,7 +36,7 @@ struct RootView: View {
                 }
                 .tint(.white) // sets the selected tab color
             } else {
-                ProgressView("Loading user...")
+                ProgressView("Loading user..")
             }
         }
     }

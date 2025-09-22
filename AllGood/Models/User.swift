@@ -11,6 +11,7 @@ import FirebaseFirestore
 struct User: Codable {
     let uid: String
     let createdAt: Date
+    var lastPost: Date
     let isAnonymous: Bool
     var username: String?
     var streakApp: Int
@@ -18,10 +19,16 @@ struct User: Codable {
     var streakPost: Int
     var streakPostBest: Int
     
-    init(uid: String, isAnonymous: Bool = true, username: String? = nil, 
+    init(uid: String, isAnonymous: Bool = true, username: String? = nil,
          streakApp: Int = 0, streakAppBest: Int = 0, streakPost: Int = 0, streakPostBest: Int = 0) {
+        
+        let calendar = Calendar.current
+        let components = DateComponents(year: 2000, month: 1, day: 1)
+        let oldDate = calendar.date(from: components) ?? Date()
+        
         self.uid = uid
         self.createdAt = Date()
+        self.lastPost = oldDate
         self.isAnonymous = isAnonymous
         self.username = username
         self.streakApp = streakApp

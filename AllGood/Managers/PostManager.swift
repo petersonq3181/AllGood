@@ -21,6 +21,7 @@ final class PostManager {
         location: GeoPoint,
         description: String
     ) async throws -> String {
+        // create post
         let post = Post(
             userId: userId,
             userName: userName,
@@ -28,9 +29,16 @@ final class PostManager {
             location: location,
             description: description
         )
-        
+        // store
         let docRef = try db.collection(collection).addDocument(from: post)
         print("createPost Post created successfully with ID: \(docRef.documentID)")
+        
+        // update user's last post date
+        let userRef = db.collection("users").document(userId)
+        try await userRef.updateData([
+            "lastPost": Timestamp(date: Date())
+        ])
+        
         return docRef.documentID
     }
         

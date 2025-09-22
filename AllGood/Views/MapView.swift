@@ -11,6 +11,12 @@ import MapKit
 struct MapView: View {
     @Environment(\.colorTheme) var theme
     
+    @State private var showNewPostForm = false
+    @State private var location: String = ""
+    @State private var selectedType: PostType? = nil
+    @State private var message: String = ""
+
+    
     @State private var bounds = MapCameraBounds(
         centerCoordinateBounds: MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 39.7392, longitude: -104.9903),
@@ -26,34 +32,127 @@ struct MapView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea(edges: .bottom)
             
-            // floating buttons (overlay)
-            VStack(spacing: 12) {
-                Button(action: {
-                    print("Add tapped")
-                }) {
-                    Image(systemName: "plus")
-                        .font(.title)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Circle())
-                        .shadow(radius: 5)
+            if !showNewPostForm {
+                // floating buttons (overlay)
+                VStack(spacing: 12) {
+                    Button(action: {
+                        print("Add tapped")
+                        showNewPostForm = true
+                    }) {
+                        Image(systemName: "plus")
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.7))
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
+                    
+                    Button(action: {
+                        print("Filter tapped")
+                    }) {
+                        Image(systemName: "slider.horizontal.3")
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .padding()
+                            .background(Color.black.opacity(0.7))
+                            .clipShape(Circle())
+                            .shadow(radius: 5)
+                    }
                 }
-                
-                Button(action: {
-                    print("Filter tapped")
-                }) {
-                    Image(systemName: "slider.horizontal.3")
-                        .font(.title)
-                        .foregroundColor(.white)
-                        .padding()
-                        .background(Color.black.opacity(0.7))
-                        .clipShape(Circle())
-                        .shadow(radius: 5)
+                .padding(.top, 25)
+                .padding(.trailing, 25)
+            }
+            
+            // poppup new post form
+            if showNewPostForm {
+                ZStack {
+                    // background tap catcher
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                        .onTapGesture {
+                            withAnimation {
+                                showNewPostForm = false
+                            }
+                        }
+                    
+                    VStack(spacing: 16) {
+                        // title
+                        Text("New Post")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.white)
+                        
+                        // location field
+                        TextField("Location", text: $location, prompt: Text("Location").foregroundColor(.gray))
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(12)
+                            .foregroundColor(.black)
+                        
+                        // type dropdown
+                        Menu {
+                            ForEach(PostType.allCases, id: \.self) { type in
+                                Button(type.displayName) {
+                                    selectedType = type
+                                }
+                            }
+                        } label: {
+                            HStack {
+                                Text(selectedType?.displayName ?? "Type")
+                                    .foregroundColor(selectedType == nil ? .gray : .black)
+                                Spacer()
+                                Image(systemName: "chevron.down")
+                                    .foregroundColor(.gray)
+                            }
+                            .padding()
+                            .background(Color.white)
+                            .cornerRadius(12)
+                        }
+                        
+                        // message field (z-stack hack to get placeholder text)
+                        ZStack(alignment: .topLeading) {
+                            if message.isEmpty {
+                                Text("Message...")
+                                    .foregroundColor(.gray)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 20)
+                            }
+                            
+                            TextEditor(text: $message)
+                                .padding(12)
+                                .opacity(message.isEmpty ? 0.01 : 1)
+                        }
+                        .frame(height: 100)
+                        .background(Color.white)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.gray, lineWidth: 1)
+                        )
+                        
+                        // post button
+                        Button(action: {
+                            print("Post tapped")
+                        }) {
+                            Text("Post")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(theme.primary)
+                                .foregroundColor(.white)
+                                .cornerRadius(25)
+                        }
+                        .padding(.top, 4)
+                        .frame(maxWidth: 160)
+                    }
+                    .padding(20)
+                    .background(theme.secondary)
+                    .cornerRadius(10)
+                    .shadow(radius: 8)
+                    .padding()
                 }
             }
-            .padding(.top, 25)
-            .padding(.trailing, 25)
         }
         // attach this to the *content view* inside the tab
         .toolbarBackground(Color(theme.secondary), for: .tabBar)

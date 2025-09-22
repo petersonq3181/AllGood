@@ -16,7 +16,7 @@ class PostViewModel: ObservableObject {
     @Published var posts: [Post] = []
     
     // posts around the world
-    var postLocations: [PostLocation] = []
+    @Published var postLocations: [PostLocation] = []
     
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -42,7 +42,6 @@ class PostViewModel: ObservableObject {
     }
     
     func fetchAllPosts() {
-        print("in postViewModel fetchAllPosts")
         postManager.fetchAllPostLocations { [weak self] posts in
             DispatchQueue.main.async {
                 self?.postLocations = posts
@@ -61,14 +60,19 @@ class PostViewModel: ObservableObject {
             do {
                 isLoading = true
                 errorMessage = nil
-                let _ = try await postManager.createPost(
+                let newPostId = try await postManager.createPost(
                     userId: userId,
                     userName: userName,
                     type: type,
                     location: location,
                     description: description
                 )
+                
                 isLoading = false
+                
+                let newPostLocation = PostLocation(id: newPostId, location: location)
+                postLocations.append(newPostLocation)
+                
                 print("Post created successfully")
             } catch {
                 isLoading = false

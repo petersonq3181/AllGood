@@ -50,9 +50,10 @@ struct MapView: View {
                     }
                 }
             }
-
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(edges: .bottom)
+            
+            if postViewModel.postLocations.isEmpty { postLoadingNote }
             
             if !showNewPostForm { floatingButtons }
 
@@ -72,6 +73,21 @@ struct MapView: View {
         } message: {
             Text("Enable location in Settings to attach your approximate location to posts.")
         }
+    }
+    
+    private var postLoadingNote: some View {
+        HStack {
+            Text("Loading posts..")
+                .font(.footnote)
+                .foregroundColor(.gray)
+                .padding(8)
+                .background(Color.white.opacity(0.7))
+                .cornerRadius(8)
+            Spacer()
+        }
+        .padding(.top, 25)
+        .padding(.leading, 16)
+        .transition(.opacity)
     }
     
     private var floatingButtons: some View {
@@ -147,7 +163,7 @@ struct MapView: View {
     private var messageField: some View {
         ZStack(alignment: .topLeading) {
             if message.isEmpty {
-                Text("Message...")
+                Text("Message..")
                     .foregroundColor(.gray)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
@@ -200,9 +216,11 @@ struct MapView: View {
                     // fallback (show alert, etc.)
                     return
                 }
+                
+                let randomizedLoc = locationManager.randomNearbyLocation(from: loc, maxMeters: 5000)
 
-                let geo = GeoPoint(latitude: loc.coordinate.latitude,
-                                   longitude: loc.coordinate.longitude)
+                let geo = GeoPoint(latitude: randomizedLoc.coordinate.latitude,
+                                   longitude: randomizedLoc.coordinate.longitude)
 
                 postViewModel.createPost(
                     userId: authViewModel.user?.uid ?? "",

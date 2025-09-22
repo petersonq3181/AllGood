@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject private var postViewModel = PostViewModel(postManager: PostManager())
-    @ObservedObject var authViewModel = AuthenticationViewModel()
+    @ObservedObject var authViewModel: AuthenticationViewModel
     
     private let theme = ColorThemeA()
     

@@ -2,6 +2,8 @@ import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 
+private var userListenerRegistration: ListenerRegistration?
+
 @MainActor
 class AuthenticationViewModel: ObservableObject {
     @Published var user: User? = nil
@@ -19,6 +21,7 @@ class AuthenticationViewModel: ObservableObject {
             let authDataResult = try authManager.getAuthenticatedUser()
             
             await fetchUserDocument(uid: authDataResult.uid)
+            startUserDocumentListener(uid: authDataResult.uid)
             
             print("loadCurrentUser Found existing user: \(authDataResult.uid)")
         } catch {
@@ -26,6 +29,7 @@ class AuthenticationViewModel: ObservableObject {
             do {
                 let authDataResult = try await authManager.signInAnonymous()
                 await fetchUserDocument(uid: authDataResult.uid)
+                startUserDocumentListener(uid: authDataResult.uid)
                 print("loadCurrentUser Created anonymous user: \(authDataResult.uid)")
             } catch {
                 print("loadCurrentUser Failed to sign in anonymously: \(error)")
@@ -54,6 +58,29 @@ class AuthenticationViewModel: ObservableObject {
             print("fetchUserDocument Failed to fetch/create user document: \(error)")
         }
     }
+
+    private func startUserDocumentListener(uid: String) {
+        // remove any existing listener before adding a new one
+        userListenerRegistration?.remove()
+        
+        let db = Firestore.firestore()
+        userListenerRegistration = db.collection("users").document(uid).addSnapshotListener { [weak self] snapshot, error in
+            guard let self = self else { return }
+            if let error = error {
+                print("startUserDocumentListener error: \(error)")
+                return
+            }
+            guard let snapshot = snapshot, snapshot.exists else { return }
+            do {
+                let updatedUser = try snapshot.data(as: User.self)
+                DispatchQueue.main.async {
+                    self.user = updatedUser
+                }
+            } catch {
+                print("startUserDocumentListener decode error: \(error)")
+            }
+        }
+    }
     
     // returns true if the user is allowed to post (hasn't posted in the last 24 hours)
     func userCanPost() -> Bool {
@@ -66,6 +93,8 @@ class AuthenticationViewModel: ObservableObject {
     func signOut() {
         do {
             try authManager.signOut()
+            userListenerRegistration?.remove()
+            userListenerRegistration = nil
             self.user = nil
         } catch {
             print("signOut failed: \(error)")

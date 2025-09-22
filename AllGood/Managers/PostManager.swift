@@ -39,6 +39,23 @@ final class PostManager {
             "lastPost": Timestamp(date: Date())
         ])
         
+        // update user's post streak if necessary
+        let now = Date()
+        let snapshot = try await userRef.getDocument()
+        guard let data = snapshot.data() else {
+            throw NSError(domain: "CreatePost", code: 1, userInfo: [NSLocalizedDescriptionKey: "User document not found"])
+        }
+        
+        let lastPostTimestamp = data["lastPost"] as? Timestamp
+        let lastPostDate = lastPostTimestamp?.dateValue() ?? Date.distantPast
+        let streakPost = data["streakPost"] as? Int ?? 0
+        
+        var updates: [String: Any] = ["lastPost": Timestamp(date: now)]
+        if now.timeIntervalSince(lastPostDate) <= 48 * 60 * 60 {
+            updates["streakPost"] = streakPost + 1
+        }
+        try await userRef.updateData(updates)
+                
         return docRef.documentID
     }
         

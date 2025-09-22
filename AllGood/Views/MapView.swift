@@ -128,10 +128,22 @@ struct MapView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
-                typeDropdown
-                messageField
-                postLocationNote
-                postButton
+                // authViewModel.user?
+                if authViewModel.userCanPost() {
+                    typeDropdown
+                    messageField
+                    postLocationNote
+                    postButton
+                } else {
+                    VStack {
+                        Text("Daily Limit Reached")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                        Text("You can only post once per day")
+                            .font(.subheadline)
+                            .foregroundColor(.white)
+                    }
+                }
             }
             .padding(20)
             .background(theme.secondary)

@@ -9,7 +9,11 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
+    
     @Environment(\.colorTheme) var theme
+    
+    @StateObject private var locationManager = LocationManager()
+    @State private var showLocationDeniedAlert = false
     
     @State private var showNewPostForm = false
     @State private var location: String = ""
@@ -135,7 +139,24 @@ struct MapView: View {
                         
                         // post button
                         Button(action: {
-                            print("Post tapped")
+                            guard isFormValid else { return }
+                            
+                            switch locationManager.authorizationStatus {
+                            case .notDetermined:
+                                // first time: ask
+                                locationManager.requestAuthorization()
+                                locationManager.requestSingleLocation()
+                                
+                            case .authorizedWhenInUse, .authorizedAlways:
+                                // already granted: get location
+                                locationManager.requestSingleLocation()
+                                
+                            case .denied, .restricted, .none:
+                                // user denied: show alert
+                                showLocationDeniedAlert = true
+                            @unknown default:
+                                break
+                            }
                         }) {
                             Text("Post")
                                 .fontWeight(.semibold)
@@ -160,6 +181,23 @@ struct MapView: View {
         // attach this to the *content view* inside the tab
         .toolbarBackground(Color(theme.secondary), for: .tabBar)
         .toolbarBackground(.visible, for: .tabBar)
+        // fallback for location enabling
+        .alert("Location Access Disabled", isPresented: $showLocationDeniedAlert) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Enable location in Settings to attach your approximate location to posts.")
+        }
+        .onChange(of: locationManager.lastLocation) {
+            // use locationManager.lastLocation directly
+            guard showNewPostForm, let loc = locationManager.lastLocation else { return }
+            location = "\(loc.coordinate.latitude), \(loc.coordinate.longitude)"
+            withAnimation { showNewPostForm = false }
+        }
     }
 }
 

@@ -15,8 +15,11 @@ struct MapView: View {
     @State private var location: String = ""
     @State private var selectedType: PostType? = nil
     @State private var message: String = ""
+    var isFormValid: Bool {
+        selectedType != nil &&
+        !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
 
-    
     @State private var bounds = MapCameraBounds(
         centerCoordinateBounds: MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 39.7392, longitude: -104.9903),
@@ -83,13 +86,6 @@ struct MapView: View {
                             .fontWeight(.bold)
                             .foregroundColor(.white)
                         
-                        // location field
-                        TextField("Location", text: $location, prompt: Text("Location").foregroundColor(.gray))
-                            .padding()
-                            .background(Color.white)
-                            .cornerRadius(12)
-                            .foregroundColor(.black)
-                        
                         // type dropdown
                         Menu {
                             ForEach(PostType.allCases, id: \.self) { type in
@@ -131,6 +127,12 @@ struct MapView: View {
                                 .stroke(Color.gray, lineWidth: 1)
                         )
                         
+                        Text("Posts to general area, not exact address")
+                            .font(.footnote)
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+                        
                         // post button
                         Button(action: {
                             print("Post tapped")
@@ -139,12 +141,13 @@ struct MapView: View {
                                 .fontWeight(.semibold)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(theme.primary)
+                                .background(isFormValid ? theme.primary : Color.gray.opacity(0.5))
                                 .foregroundColor(.white)
                                 .cornerRadius(25)
                         }
                         .padding(.top, 4)
                         .frame(maxWidth: 160)
+                        .disabled(!isFormValid)
                     }
                     .padding(20)
                     .background(theme.secondary)

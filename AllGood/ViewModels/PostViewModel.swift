@@ -48,6 +48,34 @@ class PostViewModel: ObservableObject {
             }
         }
     }
+    
+    func createPost(
+        userId: String,
+        userName: String,
+        type: PostType,
+        location: GeoPoint,
+        description: String
+    ) {
+        Task {
+            do {
+                isLoading = true
+                errorMessage = nil
+                let _ = try await postManager.createPost(
+                    userId: userId,
+                    userName: userName,
+                    type: type,
+                    location: location,
+                    description: description
+                )
+                isLoading = false
+                print("Post created successfully")
+            } catch {
+                isLoading = false
+                errorMessage = error.localizedDescription
+                print("Failed to create post: \(error)")
+            }
+        }
+    }
 }
 
 #if DEBUG

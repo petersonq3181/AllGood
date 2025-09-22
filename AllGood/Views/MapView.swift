@@ -20,7 +20,6 @@ struct MapView: View {
     @State private var showLocationDeniedAlert = false
     
     @State private var showNewPostForm = false
-    @State private var location: String = ""
     @State private var selectedType: PostType? = nil
     @State private var message: String = ""
     var isFormValid: Bool {
@@ -60,12 +59,6 @@ struct MapView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Enable location in Settings to attach your approximate location to posts.")
-        }
-        .onChange(of: locationManager.lastLocation) {
-            // use locationManager.lastLocation directly
-            guard showNewPostForm, let loc = locationManager.lastLocation else { return }
-            location = "\(loc.coordinate.latitude), \(loc.coordinate.longitude)"
-            withAnimation { showNewPostForm = false }
         }
     }
     
@@ -187,10 +180,28 @@ struct MapView: View {
         switch locationManager.authorizationStatus {
         case .notDetermined:
             locationManager.requestAuthorization()
-            locationManager.requestSingleLocation()
+            // locationManager.requestSingleLocation()
             
         case .authorizedWhenInUse, .authorizedAlways:
-            locationManager.requestSingleLocation()
+            locationManager.requestSingleLocation { loc in
+                guard let loc = loc else {
+                    // fallback (show alert, etc.)
+                    return
+                }
+
+                let geo = GeoPoint(latitude: loc.coordinate.latitude,
+                                   longitude: loc.coordinate.longitude)
+
+                postViewModel.createPost(
+                    userId: authViewModel.user?.uid ?? "",
+                    userName: authViewModel.user?.username ?? "",
+                    type: selectedType ?? PostType.donation,
+                    location: geo,
+                    description: message
+                )
+
+                withAnimation { showNewPostForm = false }
+            }
             
         case .denied, .restricted, .none:
             showLocationDeniedAlert = true

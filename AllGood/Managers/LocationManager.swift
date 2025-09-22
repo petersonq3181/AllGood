@@ -15,6 +15,7 @@ class LocationManager: NSObject, ObservableObject {
     @Published var lastLocation: CLLocation?
     @Published var authorizationStatus: CLAuthorizationStatus?
     @Published var error: Error?
+    private var singleLocationCompletion: ((CLLocation?) -> Void)?
 
     override init() {
         super.init()
@@ -30,19 +31,24 @@ class LocationManager: NSObject, ObservableObject {
         manager.requestWhenInUseAuthorization()
     }
     
-    func requestSingleLocation() {
-        // will trigger delegate callbacks once, then stop automatically
+    func requestSingleLocation(completion: @escaping (CLLocation?) -> Void) {
+        singleLocationCompletion = completion
         manager.requestLocation()
     }
 }
 
 extension LocationManager: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        lastLocation = locations.first
+        let loc = locations.first
+        lastLocation = loc
+        singleLocationCompletion?(loc)
+        singleLocationCompletion = nil
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        self.error = error
+        print("Location error: \(error.localizedDescription)")
+        singleLocationCompletion?(nil)
+        singleLocationCompletion = nil
     }
     
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {

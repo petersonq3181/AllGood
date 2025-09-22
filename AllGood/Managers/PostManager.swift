@@ -80,6 +80,25 @@ final class PostManager {
         return posts
     }
     
+    func fetchAllPostLocations(completion: @escaping ([PostLocation]) -> Void) {
+        db.collection("posts").getDocuments { snapshot, error in
+            if let error = error {
+                print("Error fetching post locations: \(error)")
+                completion([])
+                return
+            }
+            
+            let posts: [PostLocation] = snapshot?.documents.compactMap { doc in
+                guard let geoPoint = doc.get("location") as? GeoPoint else {
+                    return nil
+                }
+                return PostLocation(id: doc.documentID, location: geoPoint)
+            } ?? []
+
+            completion(posts)
+        }
+    }
+    
     // MARK: HELPERS
     
     private func calculateDistance(from: GeoPoint, to: GeoPoint) -> Double {

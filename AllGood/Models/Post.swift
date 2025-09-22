@@ -7,6 +7,7 @@
 
 import Foundation
 import FirebaseFirestore
+import CoreLocation
 
 enum PostType: String, CaseIterable, Codable {
     case donation
@@ -15,6 +16,18 @@ enum PostType: String, CaseIterable, Codable {
     
     var displayName: String {
         return self.rawValue.capitalized
+    }
+}
+
+struct PostLocation: Identifiable {
+    let id: String
+    let location: GeoPoint
+    
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(
+            latitude: location.latitude,
+            longitude: location.longitude
+        )
     }
 }
 

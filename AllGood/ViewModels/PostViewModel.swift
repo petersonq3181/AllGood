@@ -11,7 +11,13 @@ import FirebaseFirestore
 
 @MainActor
 class PostViewModel: ObservableObject {
+    
+    // posts for current user
     @Published var posts: [Post] = []
+    
+    // posts around the world
+    var postLocations: [PostLocation] = []
+    
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -35,16 +41,11 @@ class PostViewModel: ObservableObject {
         }
     }
     
-    func loadAllPosts() {
-        Task {
-            do {
-                isLoading = true
-                errorMessage = nil
-                posts = try await postManager.fetchAllPosts()
-                isLoading = false
-            } catch {
-                errorMessage = error.localizedDescription
-                isLoading = false
+    func fetchAllPosts() {
+        print("in postViewModel fetchAllPosts")
+        postManager.fetchAllPostLocations { [weak self] posts in
+            DispatchQueue.main.async {
+                self?.postLocations = posts
             }
         }
     }
@@ -88,6 +89,6 @@ final class MockPostViewModel: PostViewModel {
     
     // Disable networking in previews
     override func loadUserPosts(userId: String) { }
-    override func loadAllPosts() { }
+    override func fetchAllPosts() { }
 }
 #endif

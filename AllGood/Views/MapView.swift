@@ -38,9 +38,21 @@ struct MapView: View {
     
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            Map(bounds: bounds)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .ignoresSafeArea(edges: .bottom)
+            Map(bounds: bounds) {
+                ForEach(postViewModel.postLocations, id: \.id) { post in
+                    Annotation("", coordinate: post.coordinate) {
+                        Image(systemName: "heart.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(theme.primary)
+                            .shadow(radius: 2)
+                    }
+                }
+            }
+
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .ignoresSafeArea(edges: .bottom)
             
             if !showNewPostForm { floatingButtons }
 

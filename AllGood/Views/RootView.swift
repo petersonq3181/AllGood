@@ -23,6 +23,9 @@ struct RootView: View {
                             Image(systemName: "map")
                             Text("Map")
                         }
+                        .onAppear {
+                            postViewModel.fetchAllPosts()
+                        }
                     
                     ProfileView(authViewModel: authViewModel, postViewModel: postViewModel)
                         .environment(\.colorTheme, theme)

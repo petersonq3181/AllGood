@@ -31,10 +31,6 @@ final class AuthenticationManager {
         
         return AuthDataResultModel(user: user)
     }
-    
-    func signOut() throws {
-        try Auth.auth().signOut()
-    }
 }
 
 // MARK: SIGN IN ANONYMOUS

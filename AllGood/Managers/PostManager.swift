@@ -104,7 +104,7 @@ final class PostManager {
         return posts
     }
     
-    func fetchAllPostLocations(completion: @escaping ([PostLocation]) -> Void) {
+    func fetchAllWorldPosts(completion: @escaping ([PostLocation]) -> Void) {
         db.collection("posts").getDocuments { snapshot, error in
             if let error = error {
                 print("Error fetching post locations: \(error)")

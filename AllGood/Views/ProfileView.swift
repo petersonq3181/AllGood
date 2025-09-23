@@ -84,7 +84,7 @@ struct ProfileView: View {
                     // scrollable posts section
                     ScrollView {
                         VStack(spacing: 16) {
-                            ForEach(postViewModel.posts) { post in
+                            ForEach(postViewModel.userPosts) { post in
                                 VStack(alignment: .leading, spacing: 12) {
                                     HStack(alignment: .center, spacing: 16) {
                                         // circle with first letter

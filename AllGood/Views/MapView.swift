@@ -40,7 +40,7 @@ struct MapView: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             Map(bounds: bounds) {
-                ForEach(postViewModel.postLocations, id: \.id) { post in
+                ForEach(postViewModel.worldPosts, id: \.id) { post in
                     Annotation("", coordinate: post.coordinate) {
                         Image(systemName: "heart.fill")
                             .resizable()
@@ -54,7 +54,7 @@ struct MapView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(edges: .bottom)
             
-            if postViewModel.postLocations.isEmpty { postLoadingNote }
+            if postViewModel.worldPosts.isEmpty { postLoadingNote }
             
             if !showNewPostForm { floatingButtons }
 

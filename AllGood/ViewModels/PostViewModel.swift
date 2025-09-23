@@ -13,10 +13,10 @@ import FirebaseFirestore
 class PostViewModel: ObservableObject {
     
     // posts for current user
-    @Published var posts: [Post] = []
+    @Published var userPosts: [Post] = []
     
     // posts around the world
-    @Published var postLocations: [PostLocation] = []
+    @Published var worldPosts: [PostLocation] = []
     
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -32,7 +32,7 @@ class PostViewModel: ObservableObject {
             do {
                 isLoading = true
                 errorMessage = nil
-                posts = try await postManager.fetchPostsByUser(userId: userId)
+                userPosts = try await postManager.fetchPostsByUser(userId: userId)
                 isLoading = false
             } catch {
                 errorMessage = error.localizedDescription
@@ -42,9 +42,9 @@ class PostViewModel: ObservableObject {
     }
     
     func fetchAllPosts() {
-        postManager.fetchAllPostLocations { [weak self] posts in
+        postManager.fetchAllWorldPosts { [weak self] posts in
             DispatchQueue.main.async {
-                self?.postLocations = posts
+                self?.worldPosts = posts
             }
         }
     }
@@ -71,7 +71,7 @@ class PostViewModel: ObservableObject {
                 isLoading = false
                 
                 let newPostLocation = PostLocation(id: newPostId, location: location)
-                postLocations.append(newPostLocation)
+                worldPosts.append(newPostLocation)
                 
                 print("Post created successfully")
             } catch {
@@ -98,7 +98,7 @@ final class MockPostViewModel: PostViewModel {
     init(posts: [Post] = Post.mockPosts) {
         // Don’t call Firestore-backed init, just inject a dummy manager
         super.init(postManager: PostManager())
-        self.posts = posts
+        self.userPosts = userPosts
     }
     
     // Disable networking in previews

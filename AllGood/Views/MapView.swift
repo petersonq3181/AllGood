@@ -79,55 +79,13 @@ struct MapView: View {
             Text("Enable location in Settings to attach your approximate location to posts.")
         }
         // tapped post bottom sheet
-        .sheet(item: $selectedPost) { post in
-            VStack(spacing: 16) {
-                Capsule()
-                    .fill(Color.gray.opacity(0.4))
-                    .frame(width: 40, height: 5)
-                    .padding(.top, 8)
-                Group {
-                    if let details = postViewModel.selectedPostDetails, details.id == post.id {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text(details.userName)
-                                .font(.headline)
-                            Text(details.type.displayName)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                            Divider()
-                            Text(details.description)
-                                .font(.body)
-                            Divider()
-                            let lat = String(format: "%.5f", post.coordinate.latitude)
-                            let lon = String(format: "%.5f", post.coordinate.longitude)
-                            HStack {
-                                Text("Latitude:")
-                                    .foregroundColor(.secondary)
-                                Spacer()
-                                Text(lat).monospacedDigit()
-                            }
-                            HStack {
-                                Text("Longitude:")
-                                    .foregroundColor(.secondary)
-                                Spacer()
-                                Text(lon).monospacedDigit()
-                            }
-                        }
-                        .padding(.horizontal)
-                    } else {
-                        VStack(spacing: 12) {
-                            ProgressView()
-                            Text("Loading post...")
-                                .font(.footnote)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                }
-                Spacer()
-            }
-            .onAppear { postViewModel.fetchPostById(post.id) }
-            .onDisappear { postViewModel.selectedPostDetails = nil }
-            .presentationDetents([.fraction(0.66)])
-            .presentationDragIndicator(.visible)
+        .sheet(
+            isPresented: Binding(
+                get: { selectedPost != nil },
+                set: { if !$0 { selectedPost = nil } }
+            )
+        ) {
+            tappedPostSheet
         }
     }
     
@@ -313,6 +271,66 @@ struct MapView: View {
         @unknown default:
             break
         }
+    }
+    
+    private var tappedPostSheet: some View {
+        VStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 16) {
+                Capsule()
+                    .fill(Color.gray.opacity(0.4))
+                    .frame(width: 40, height: 5)
+                    .padding(.top, 8)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                Group {
+                    if let post = selectedPost,
+                       let details = postViewModel.selectedPostDetails,
+                       details.id == post.id {
+                        VStack(alignment: .leading, spacing: 16) {
+                            // date
+                            Text(details.timestamp.formatted(date: .long, time: .omitted))
+                                .font(.subheadline)
+                            // category
+                            Text(details.type.displayName)
+                                .font(.subheadline)
+                                .foregroundColor(theme.quaternary)
+                            // description
+                            Text(details.description)
+                                .font(.body)
+                                .padding(.top, 8)
+                            Spacer()
+                            // footer: Post from @username
+                            HStack(spacing: 6) {
+                                Text("Post from")
+                                    .font(.subheadline)
+                                    .foregroundColor(.primary)
+                                Text("@\(details.userName)")
+                                    .font(.subheadline)
+                                    .foregroundColor(theme.tertiary)
+                            }
+                            .padding(.bottom, 8)
+                        }
+                        .padding(.horizontal, 45)
+                    } else if selectedPost != nil {
+                        VStack(spacing: 12) {
+                            ProgressView()
+                            Text("Loading post...")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(.horizontal, 24)
+                    } else {
+                        EmptyView()
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.bottom)
+        }
+        .onAppear {
+            if let post = selectedPost { postViewModel.fetchPostById(post.id) }
+        }
+        .onDisappear { postViewModel.selectedPostDetails = nil }
+        .presentationDetents([.fraction(0.66)])
     }
 }
 

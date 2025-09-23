@@ -123,6 +123,16 @@ final class PostManager {
         }
     }
     
+    func fetchPostById(_ id: String) async throws -> Post {
+        let doc = try await db.collection(collection).document(id).getDocument()
+        guard doc.exists else {
+            throw NSError(domain: "fetchPostById",
+                          code: 404,
+                          userInfo: [NSLocalizedDescriptionKey: "Post not found"])
+        }
+        return try doc.data(as: Post.self)
+    }
+    
     func userCanPost(userId: String) async throws -> Bool {
         let userRef = db.collection("users").document(userId)
         let snapshot = try await userRef.getDocument()

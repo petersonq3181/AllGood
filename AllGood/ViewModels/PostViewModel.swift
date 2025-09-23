@@ -20,6 +20,7 @@ class PostViewModel: ObservableObject {
     
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var selectedPostDetails: Post?
     
     private let postManager: PostManager
     
@@ -78,6 +79,21 @@ class PostViewModel: ObservableObject {
                 isLoading = false
                 errorMessage = error.localizedDescription
                 print("Failed to create post: \(error)")
+            }
+        }
+    }
+    
+    func fetchPostById(_ id: String) {
+        Task {
+            do {
+                isLoading = true
+                errorMessage = nil
+                let post = try await postManager.fetchPostById(id)
+                selectedPostDetails = post
+                isLoading = false
+            } catch {
+                errorMessage = error.localizedDescription
+                isLoading = false
             }
         }
     }

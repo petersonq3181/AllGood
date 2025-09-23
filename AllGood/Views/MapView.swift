@@ -27,6 +27,8 @@ struct MapView: View {
         selectedType != nil &&
         !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
+    
+    @State private var selectedPost: PostLocation? = nil
 
     @State private var bounds = MapCameraBounds(
         centerCoordinateBounds: MKCoordinateRegion(
@@ -42,12 +44,14 @@ struct MapView: View {
             Map(bounds: bounds) {
                 ForEach(postViewModel.worldPosts, id: \.id) { post in
                     Annotation("", coordinate: post.coordinate) {
-                        Image(systemName: "heart.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(theme.primary)
-                            .shadow(radius: 2)
+                        Button(action: { selectedPost = post }) {
+                            Image(systemName: "heart.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 20, height: 20)
+                                .foregroundColor(theme.primary)
+                                .shadow(radius: 2)
+                        }
                     }
                 }
             }
@@ -73,6 +77,57 @@ struct MapView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Enable location in Settings to attach your approximate location to posts.")
+        }
+        // tapped post bottom sheet
+        .sheet(item: $selectedPost) { post in
+            VStack(spacing: 16) {
+                Capsule()
+                    .fill(Color.gray.opacity(0.4))
+                    .frame(width: 40, height: 5)
+                    .padding(.top, 8)
+                Group {
+                    if let details = postViewModel.selectedPostDetails, details.id == post.id {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(details.userName)
+                                .font(.headline)
+                            Text(details.type.displayName)
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                            Divider()
+                            Text(details.description)
+                                .font(.body)
+                            Divider()
+                            let lat = String(format: "%.5f", post.coordinate.latitude)
+                            let lon = String(format: "%.5f", post.coordinate.longitude)
+                            HStack {
+                                Text("Latitude:")
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text(lat).monospacedDigit()
+                            }
+                            HStack {
+                                Text("Longitude:")
+                                    .foregroundColor(.secondary)
+                                Spacer()
+                                Text(lon).monospacedDigit()
+                            }
+                        }
+                        .padding(.horizontal)
+                    } else {
+                        VStack(spacing: 12) {
+                            ProgressView()
+                            Text("Loading post...")
+                                .font(.footnote)
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                }
+                Spacer()
+            }
+            .onAppear { postViewModel.fetchPostById(post.id) }
+            .onDisappear { postViewModel.selectedPostDetails = nil }
+            .presentationDetents([.fraction(0.66)])
+            .presentationDragIndicator(.visible)
         }
     }
     

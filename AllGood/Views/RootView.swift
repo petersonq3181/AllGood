@@ -9,7 +9,8 @@ import SwiftUI
 
 struct RootView: View {
     @StateObject private var postViewModel = PostViewModel(postManager: PostManager())
-    @ObservedObject var authViewModel: AuthenticationViewModel
+
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     
     private let theme = ColorThemeA()
     
@@ -17,8 +18,9 @@ struct RootView: View {
         Group {
             if let user = authViewModel.user {
                 TabView {
-                    MapView(authViewModel: authViewModel, postViewModel: postViewModel)
+                    MapView(postViewModel: postViewModel)
                         .environment(\.colorTheme, theme)
+                        .environmentObject(authViewModel)
                         .tabItem {
                             Image(systemName: "map")
                             Text("Map")
@@ -27,8 +29,9 @@ struct RootView: View {
                             postViewModel.fetchAllPosts()
                         }
                     
-                    ProfileView(authViewModel: authViewModel, postViewModel: postViewModel)
+                    ProfileView(postViewModel: postViewModel)
                         .environment(\.colorTheme, theme)
+                        .environmentObject(authViewModel)
                         .tabItem {
                             Image(systemName: "person")
                             Text("Profile")
@@ -43,6 +46,7 @@ struct RootView: View {
 }
 
 #Preview {
-    var authViewModel = AuthenticationViewModel()
-    RootView(authViewModel: authViewModel)
+    let authViewModel = AuthenticationViewModel()
+    RootView()
+        .environmentObject(authViewModel)
 }

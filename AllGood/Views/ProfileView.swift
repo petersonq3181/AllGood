@@ -8,9 +8,11 @@
 import SwiftUI
 
 struct ProfileView: View {
-    @ObservedObject var authViewModel: AuthenticationViewModel
-    @ObservedObject var postViewModel: PostViewModel
+    
     @Environment(\.colorTheme) var theme
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
+    
+    @ObservedObject var postViewModel: PostViewModel
     
     var body: some View {
         NavigationView {
@@ -149,5 +151,6 @@ struct ProfileView: View {
     let mockAuthVM = MockAuthenticationViewModel()
     let mockPostVM = MockPostViewModel()
     
-    ProfileView(authViewModel: mockAuthVM, postViewModel: mockPostVM)
+    ProfileView(postViewModel: mockPostVM)
+        .environmentObject(mockAuthVM)
 }

@@ -12,8 +12,8 @@ import FirebaseFirestore
 struct MapView: View {
     
     @Environment(\.colorTheme) var theme
+    @EnvironmentObject var authViewModel: AuthenticationViewModel
     
-    @ObservedObject var authViewModel: AuthenticationViewModel
     @ObservedObject var postViewModel: PostViewModel
     
     @StateObject private var locationManager = LocationManager()
@@ -264,5 +264,6 @@ struct MapView: View {
 #Preview {
     let mockAuthVM = MockAuthenticationViewModel()
     let mockPostVM = MockPostViewModel()
-    MapView(authViewModel: mockAuthVM, postViewModel: mockPostVM)
+    MapView(postViewModel: mockPostVM)
+        .environmentObject(mockAuthVM)
 }

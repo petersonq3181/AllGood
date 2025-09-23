@@ -19,7 +19,8 @@ struct AllGoodApp: App {
 
     var body: some Scene {
         WindowGroup {
-            RootView(authViewModel: authViewModel)
+            RootView()
+                .environmentObject(authViewModel)
         }
     }
 }

@@ -137,14 +137,6 @@ class AuthenticationViewModel: ObservableObject {
         }
     }
     
-    // returns true if the user is allowed to post (hasn't posted in the last 24 hours)
-    func userCanPost() -> Bool {
-        guard let lastPost = user?.lastPost else {
-            return true
-        }
-        return Date().timeIntervalSince(lastPost) >= 24 * 60 * 60
-    }
-    
     func signOut() {
         do {
             try authManager.signOut()

@@ -22,6 +22,7 @@ struct MapView: View {
     @State private var showNewPostForm = false
     @State private var selectedType: PostType? = nil
     @State private var message: String = ""
+    @State private var canPost: Bool? = nil
     var isFormValid: Bool {
         selectedType != nil &&
         !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -128,21 +129,25 @@ struct MapView: View {
                     .fontWeight(.bold)
                     .foregroundColor(.white)
                 
-                // authViewModel.user?
-                if authViewModel.userCanPost() {
-                    typeDropdown
-                    messageField
-                    postLocationNote
-                    postButton
-                } else {
-                    VStack {
-                        Text("Daily Limit Reached")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
-                        Text("You can only post once per day")
-                            .font(.subheadline)
-                            .foregroundColor(.white)
+                if let canPost = canPost {
+                    if canPost {
+                        typeDropdown
+                        messageField
+                        postLocationNote
+                        postButton
+                    } else {
+                        VStack {
+                            Text("Daily Limit Reached")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                            Text("You can only post once per day")
+                                .font(.subheadline)
+                                .foregroundColor(.white)
+                        }
                     }
+                } else {
+                    ProgressView("Checking..")
+                        .foregroundColor(.white)
                 }
             }
             .padding(20)
@@ -150,6 +155,9 @@ struct MapView: View {
             .cornerRadius(10)
             .shadow(radius: 8)
             .padding()
+            .task {
+                canPost = await postViewModel.userCanPost(userId: authViewModel.user?.uid ?? "")
+            }
         }
     }
         

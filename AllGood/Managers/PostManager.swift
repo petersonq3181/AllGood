@@ -123,6 +123,27 @@ final class PostManager {
         }
     }
     
+    func userCanPost(userId: String) async throws -> Bool {
+        let userRef = db.collection("users").document(userId)
+        let snapshot = try await userRef.getDocument()
+        
+        guard let data = snapshot.data() else {
+            throw NSError(domain: "userCanPost",
+                          code: 1,
+                          userInfo: [NSLocalizedDescriptionKey: "User document not found"])
+        }
+        
+        if let lastPost = data["lastPost"] as? Timestamp {
+            let lastPostDate = lastPost.dateValue()
+            
+            // compare just the day/month/year, ignoring time
+            let calendar = Calendar.current
+            return !calendar.isDateInToday(lastPostDate)
+        }
+        
+        return true
+    }
+    
     // MARK: HELPERS
     
     private func calculateDistance(from: GeoPoint, to: GeoPoint) -> Double {

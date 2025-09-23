@@ -81,6 +81,16 @@ class PostViewModel: ObservableObject {
             }
         }
     }
+    
+    // returns true if the user is allowed to post (hasn't posted in the last 24 hours)
+    func userCanPost(userId: String) async -> Bool {
+        do {
+            return try await postManager.userCanPost(userId: userId)
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
+        }
+    }
 }
 
 #if DEBUG

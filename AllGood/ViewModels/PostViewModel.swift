@@ -55,6 +55,7 @@ class PostViewModel: ObservableObject {
         userName: String,
         type: PostType,
         location: GeoPoint,
+        locationString: String,
         description: String
     ) {
         Task {
@@ -66,6 +67,7 @@ class PostViewModel: ObservableObject {
                     userName: userName,
                     type: type,
                     location: location,
+                    locationString: locationString,
                     description: description
                 )
                 

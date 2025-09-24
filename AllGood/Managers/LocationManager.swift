@@ -11,10 +11,13 @@ import Combine
 
 class LocationManager: NSObject, ObservableObject {
     private let manager = CLLocationManager()
+    private let geocoder = CLGeocoder()
     
     @Published var lastLocation: CLLocation?
     @Published var authorizationStatus: CLAuthorizationStatus?
     @Published var error: Error?
+    @Published var lastLocationString: String?
+
     private var singleLocationCompletion: ((CLLocation?) -> Void)?
 
     override init() {
@@ -35,6 +38,30 @@ class LocationManager: NSObject, ObservableObject {
         singleLocationCompletion = completion
         manager.requestLocation()
     }
+    
+    func reverseGeocode(_ location: CLLocation, completion: @escaping (String?) -> Void) {
+        geocoder.reverseGeocodeLocation(location) { placemarks, error in
+            if let placemark = placemarks?.first {
+                let parts: [String] = [
+                    placemark.subLocality,        // e.g. "Capitol Hill"
+                    placemark.locality,           // e.g. "Seattle"
+                    placemark.administrativeArea, // e.g. "WA"
+                    placemark.country             // e.g. "United States"
+                ].compactMap { $0 }
+                
+                let locationString = parts.joined(separator: ", ")
+                DispatchQueue.main.async {
+                    self.lastLocationString = locationString
+                }
+                completion(locationString)
+            } else {
+                DispatchQueue.main.async {
+                    self.lastLocationString = nil
+                }
+                completion(nil)
+            }
+        }
+    }
 }
 
 extension LocationManager: CLLocationManagerDelegate {
@@ -43,6 +70,11 @@ extension LocationManager: CLLocationManagerDelegate {
         lastLocation = loc
         singleLocationCompletion?(loc)
         singleLocationCompletion = nil
+        
+        // automatically geocode the new location 
+        if let loc = loc {
+            reverseGeocode(loc) { _ in }
+        }
     }
     
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {

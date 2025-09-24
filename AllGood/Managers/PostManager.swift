@@ -19,6 +19,7 @@ final class PostManager {
         userName: String,
         type: PostType,
         location: GeoPoint,
+        locationString: String,
         description: String
     ) async throws -> String {
         // create post
@@ -27,6 +28,7 @@ final class PostManager {
             userName: userName,
             type: type,
             location: location,
+            locationString: locationString,
             description: description
         )
         // store

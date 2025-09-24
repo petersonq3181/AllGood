@@ -308,19 +308,25 @@ struct MapView: View {
                 }
                 
                 let randomizedLoc = locationManager.randomNearbyLocation(from: loc, maxMeters: 5000)
+                
+                // reverse geocode the randomized location
+                locationManager.reverseGeocode(randomizedLoc) { locationString in
+                    let geo = GeoPoint(
+                        latitude: randomizedLoc.coordinate.latitude,
+                        longitude: randomizedLoc.coordinate.longitude
+                    )
 
-                let geo = GeoPoint(latitude: randomizedLoc.coordinate.latitude,
-                                   longitude: randomizedLoc.coordinate.longitude)
+                    postViewModel.createPost(
+                        userId: authViewModel.user?.uid ?? "",
+                        userName: authViewModel.user?.username ?? "",
+                        type: selectedType ?? PostType.donation,
+                        location: geo,
+                        locationString: locationString ?? "",
+                        description: message
+                    )
 
-                postViewModel.createPost(
-                    userId: authViewModel.user?.uid ?? "",
-                    userName: authViewModel.user?.username ?? "",
-                    type: selectedType ?? PostType.donation,
-                    location: geo,
-                    description: message
-                )
-
-                withAnimation { showNewPostForm = false }
+                    withAnimation { showNewPostForm = false }
+                }
             }
             
         case .denied, .restricted, .none:

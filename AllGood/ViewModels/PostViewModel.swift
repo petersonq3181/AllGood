@@ -16,7 +16,11 @@ class PostViewModel: ObservableObject {
     @Published var userPosts: [Post] = []
     
     // posts around the world
-    @Published var worldPosts: [Post] = []
+//    @Published var worldPosts: [Post] = []
+    
+    @Published private var allWorldPosts: [Post] = [] // full dataset
+    @Published var worldPosts: [Post] = []            // filtered dataset
+
     
     @Published var selectedDateFilter: PostDateFilter = .all
     @Published var selectedTypeFilter: PostTypeFilter = .all
@@ -48,6 +52,7 @@ class PostViewModel: ObservableObject {
     func fetchAllPosts() {
         postManager.fetchAllWorldPosts { [weak self] posts in
             DispatchQueue.main.async {
+                self?.allWorldPosts = posts
                 self?.worldPosts = posts
             }
         }
@@ -128,7 +133,7 @@ class PostViewModel: ObservableObject {
     
     func applyFilters() {
         worldPosts = postManager.filterPosts(
-            posts: worldPosts,
+            posts: allWorldPosts,
             dateFilter: selectedDateFilter,
             typeFilter: selectedTypeFilter
         )

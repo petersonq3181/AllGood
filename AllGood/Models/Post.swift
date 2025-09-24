@@ -71,14 +71,14 @@ extension Post {
                  userName: "anon",
                  type: .donation,
                  location: GeoPoint(latitude: 33.2, longitude: -117.25),
-                 locationString: "San Francisco, CA, United States",
+                 locationString: "Capitol Hill, San Francisco, CA, United States",
                  description: "A batch of chicken pot pie delivered across the county ..."),
             Post(id: "mock2",
                  userId: "123",
                  userName: "anon",
                  type: .donation,
                  location: GeoPoint(latitude: 33.2, longitude: -117.25),
-                 locationString: "San Francisco, CA, United States",
+                 locationString: "Capitol Hill, San Francisco, CA, United States",
                  description: "A dollar donated at the grocery checkout at 3 PM on the day, despite the increased price in groceries, and even with the projection for higher inflation.")
         ]
     }

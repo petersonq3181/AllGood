@@ -11,9 +11,17 @@ import FirebaseFirestore
 struct MockPostPopup: View {
     @Environment(\.colorTheme) var theme
     let post: Post
+    
+    let postViewModel: PostViewModel = PostViewModel(postManager: PostManager())
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+            if let formatted = postViewModel.formattedLocation(for: post) {
+                Text(formatted)
+                    .font(.title2)
+                    .fontWeight(.bold)
+            }
+            
             Text(post.timestamp.formatted(date: .long, time: .omitted))
                 .font(.body)
 

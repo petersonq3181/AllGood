@@ -107,6 +107,12 @@ struct MapView: View {
             // card
             VStack(alignment: .leading, spacing: 16) {
                 if let details = postViewModel.selectedPostDetails {
+                    if let formatted = postViewModel.formattedLocation(for: details) {
+                        Text(formatted)
+                            .font(.title2)
+                            .fontWeight(.bold)
+                    }
+                    
                     Text(details.timestamp.formatted(date: .long, time: .omitted))
                         .font(.body)
 

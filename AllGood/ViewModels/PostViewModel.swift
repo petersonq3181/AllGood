@@ -109,6 +109,20 @@ class PostViewModel: ObservableObject {
             return false
         }
     }
+    
+    func formattedLocation(for post: Post) -> String? {
+        guard let locationString = post.locationString else { return nil }
+        
+        let parts = locationString
+            .split(separator: ",")
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+        
+        let primary = parts.count > 1 ? parts[1] : parts.first ?? ""
+        let secondary = parts.count > 2 ? parts[2] : parts.last ?? ""
+        
+        let result = "\(primary), \(secondary)".trimmingCharacters(in: .whitespacesAndNewlines)
+        return result.isEmpty ? nil : result
+    }
 }
 
 #if DEBUG

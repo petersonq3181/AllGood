@@ -119,7 +119,7 @@ struct ProfileView: View {
                                 .cornerRadius(10)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 10)
-                                        .stroke(theme.tertiary, lineWidth: 3)
+                                        .stroke(Color.white, lineWidth: 1)
                                 )
                                 .frame(maxWidth: 325) // control tile width here
                                 .padding(.horizontal)
@@ -150,7 +150,6 @@ struct ProfileView: View {
 #Preview {
     let mockAuthVM = MockAuthenticationViewModel()
     let mockPostVM = MockPostViewModel()
-    
     ProfileView(postViewModel: mockPostVM)
         .environmentObject(mockAuthVM)
 }

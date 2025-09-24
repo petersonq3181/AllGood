@@ -56,7 +56,6 @@ struct MapView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .ignoresSafeArea(edges: .bottom)
             
             if postViewModel.worldPosts.isEmpty { postLoadingNote }
             

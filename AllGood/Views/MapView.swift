@@ -60,9 +60,11 @@ struct MapView: View {
             
             if postViewModel.worldPosts.isEmpty { postLoadingNote }
             
-            if !showNewPostForm { floatingButtons }
+            if !showNewPostForm && selectedPost == nil { floatingButtons }
 
             if showNewPostForm { newPostForm }
+
+            if selectedPost != nil { tappedPostPopup }
         }
         // attach this to the *content view* inside the tab
         .toolbarBackground(Color(theme.secondary), for: .tabBar)
@@ -77,15 +79,6 @@ struct MapView: View {
             Button("Cancel", role: .cancel) {}
         } message: {
             Text("Enable location in Settings to attach your approximate location to posts.")
-        }
-        // tapped post bottom sheet
-        .sheet(
-            isPresented: Binding(
-                get: { selectedPost != nil },
-                set: { if !$0 { selectedPost = nil } }
-            )
-        ) {
-            tappedPostSheet
         }
     }
     
@@ -104,6 +97,70 @@ struct MapView: View {
         .transition(.opacity)
     }
     
+    private var tappedPostPopup: some View {
+        ZStack {
+            // dim background; tap outside to dismiss
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture { selectedPost = nil }
+            
+            // card
+            VStack(alignment: .leading, spacing: 16) {
+                if let details = postViewModel.selectedPostDetails {
+                    Text(details.timestamp.formatted(date: .long, time: .omitted))
+                        .font(.body)
+
+                    Text(details.type.displayName)
+                        .font(.body)
+                        .foregroundColor(theme.quaternary)
+
+                    Text(details.description)
+                        .font(.body)
+                        .multilineTextAlignment(.leading)
+                        .lineLimit(4)
+                        .truncationMode(.tail)
+                        .padding(.top, 12)
+
+                    Spacer(minLength: 0)
+
+                    HStack(spacing: 6) {
+                        Text("Post from")
+                            .font(.body)
+                            .foregroundColor(.primary)
+                        Text("@\(details.userName)")
+                            .font(.body)
+                            .foregroundColor(theme.tertiary)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                    }
+                    .padding(.bottom, 4)
+                } else {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                        Text("Loading post...")
+                            .font(.footnote)
+                            .foregroundColor(.secondary)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading) // force to left
+            .padding(.horizontal, 25)
+            .padding(.vertical, 30)
+            .frame(maxWidth: 294, maxHeight: 432)
+            .background(Color.white)
+            .cornerRadius(10)
+            .shadow(radius: 8)
+        }
+        .onAppear {
+            if let post = selectedPost {
+                postViewModel.fetchPostById(post.id)
+            }
+        }
+        .onDisappear {
+            postViewModel.selectedPostDetails = nil
+        }
+    }
+
     private var floatingButtons: some View {
         VStack(spacing: 12) {
             Button(action: { showNewPostForm = true }) {
@@ -273,65 +330,7 @@ struct MapView: View {
         }
     }
     
-    private var tappedPostSheet: some View {
-        VStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 16) {
-                Capsule()
-                    .fill(Color.gray.opacity(0.4))
-                    .frame(width: 40, height: 5)
-                    .padding(.top, 8)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                Group {
-                    if let post = selectedPost,
-                       let details = postViewModel.selectedPostDetails,
-                       details.id == post.id {
-                        VStack(alignment: .leading, spacing: 16) {
-                            // date
-                            Text(details.timestamp.formatted(date: .long, time: .omitted))
-                                .font(.subheadline)
-                            // category
-                            Text(details.type.displayName)
-                                .font(.subheadline)
-                                .foregroundColor(theme.quaternary)
-                            // description
-                            Text(details.description)
-                                .font(.body)
-                                .padding(.top, 8)
-                            Spacer()
-                            // footer: Post from @username
-                            HStack(spacing: 6) {
-                                Text("Post from")
-                                    .font(.subheadline)
-                                    .foregroundColor(.primary)
-                                Text("@\(details.userName)")
-                                    .font(.subheadline)
-                                    .foregroundColor(theme.tertiary)
-                            }
-                            .padding(.bottom, 8)
-                        }
-                        .padding(.horizontal, 45)
-                    } else if selectedPost != nil {
-                        VStack(spacing: 12) {
-                            ProgressView()
-                            Text("Loading post...")
-                                .font(.footnote)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.horizontal, 24)
-                    } else {
-                        EmptyView()
-                    }
-                }
-                Spacer(minLength: 0)
-            }
-            .padding(.bottom)
-        }
-        .onAppear {
-            if let post = selectedPost { postViewModel.fetchPostById(post.id) }
-        }
-        .onDisappear { postViewModel.selectedPostDetails = nil }
-        .presentationDetents([.fraction(0.66)])
-    }
+ 
 }
 
 #Preview {

@@ -19,18 +19,6 @@ enum PostType: String, CaseIterable, Codable {
     }
 }
 
-struct PostLocation: Identifiable {
-    let id: String
-    let location: GeoPoint
-    
-    var coordinate: CLLocationCoordinate2D {
-        CLLocationCoordinate2D(
-            latitude: location.latitude,
-            longitude: location.longitude
-        )
-    }
-}
-
 struct Post: Codable, Identifiable {
     @DocumentID var id: String?
     let userId: String
@@ -40,6 +28,13 @@ struct Post: Codable, Identifiable {
     let location: GeoPoint
     let locationString: String?
     let description: String
+    
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(
+            latitude: location.latitude,
+            longitude: location.longitude
+        )
+    }
     
     init(
         id: String? = nil,

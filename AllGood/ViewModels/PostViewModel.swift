@@ -16,7 +16,7 @@ class PostViewModel: ObservableObject {
     @Published var userPosts: [Post] = []
     
     // posts around the world
-    @Published var worldPosts: [PostLocation] = []
+    @Published var worldPosts: [Post] = []
     
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -62,7 +62,7 @@ class PostViewModel: ObservableObject {
             do {
                 isLoading = true
                 errorMessage = nil
-                let newPostId = try await postManager.createPost(
+                let newPost: Post = try await postManager.createPost(
                     userId: userId,
                     userName: userName,
                     type: type,
@@ -73,8 +73,7 @@ class PostViewModel: ObservableObject {
                 
                 isLoading = false
                 
-                let newPostLocation = PostLocation(id: newPostId, location: location)
-                worldPosts.append(newPostLocation)
+                worldPosts.append(newPost)
                 
                 print("Post created successfully")
             } catch {

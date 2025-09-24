@@ -28,7 +28,7 @@ struct MapView: View {
         !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
-    @State private var selectedPost: PostLocation? = nil
+    @State private var selectedPost: Post? = nil
 
     @State private var bounds = MapCameraBounds(
         centerCoordinateBounds: MKCoordinateRegion(
@@ -158,7 +158,7 @@ struct MapView: View {
         }
         .onAppear {
             if let post = selectedPost {
-                postViewModel.fetchPostById(post.id)
+                postViewModel.fetchPostById(post.id ?? "")
             }
         }
         .onDisappear {

@@ -21,7 +21,7 @@ final class PostManager {
         location: GeoPoint,
         locationString: String,
         description: String
-    ) async throws -> String {
+    ) async throws -> Post {
         // create post
         let post = Post(
             userId: userId,
@@ -57,7 +57,7 @@ final class PostManager {
             "streakPostBest": newStreakPostBest
         ])
                 
-        return docRef.documentID
+        return post
     }
         
     func fetchAllPosts() async throws -> [Post] {
@@ -106,24 +106,22 @@ final class PostManager {
         return posts
     }
     
-    func fetchAllWorldPosts(completion: @escaping ([PostLocation]) -> Void) {
+    func fetchAllWorldPosts(completion: @escaping ([Post]) -> Void) {
         db.collection("posts").getDocuments { snapshot, error in
             if let error = error {
-                print("Error fetching post locations: \(error)")
+                print("Error fetching posts: \(error)")
                 completion([])
                 return
             }
-            
-            let posts: [PostLocation] = snapshot?.documents.compactMap { doc in
-                guard let geoPoint = doc.get("location") as? GeoPoint else {
-                    return nil
-                }
-                return PostLocation(id: doc.documentID, location: geoPoint)
-            } ?? []
 
+            let posts: [Post] = snapshot?.documents.compactMap { doc in
+                try? doc.data(as: Post.self)
+            } ?? []
+            
             completion(posts)
         }
     }
+
     
     func fetchPostById(_ id: String) async throws -> Post {
         let doc = try await db.collection(collection).document(id).getDocument()

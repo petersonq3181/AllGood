@@ -19,6 +19,44 @@ enum PostType: String, CaseIterable, Codable {
     }
 }
 
+enum PostDateFilter: CaseIterable, Identifiable {
+    case all
+    case pastDay
+    case pastWeek
+    case pastMonth
+    case pastYear
+    
+    var id: Self { self }
+    
+    var displayName: String {
+        switch self {
+        case .all: return "All Dates"
+        case .pastDay: return "Past Day"
+        case .pastWeek: return "Past Week"
+        case .pastMonth: return "Past Month"
+        case .pastYear: return "Past Year"
+        }
+    }
+}
+
+enum PostTypeFilter: CaseIterable, Identifiable {
+    case all
+    case donation
+    case volunteering
+    case kindness
+    
+    var id: Self { self }
+    
+    var displayName: String {
+        switch self {
+        case .all: return "All Types"
+        case .donation: return "Donation"
+        case .volunteering: return "Volunteering"
+        case .kindness: return "Kindness"
+        }
+    }
+}
+
 struct Post: Codable, Identifiable {
     @DocumentID var id: String?
     let userId: String

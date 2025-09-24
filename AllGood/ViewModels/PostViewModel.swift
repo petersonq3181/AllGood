@@ -18,6 +18,9 @@ class PostViewModel: ObservableObject {
     // posts around the world
     @Published var worldPosts: [Post] = []
     
+    @Published var selectedDateFilter: PostDateFilter = .all
+    @Published var selectedTypeFilter: PostTypeFilter = .all
+    
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var selectedPostDetails: Post?
@@ -121,6 +124,14 @@ class PostViewModel: ObservableObject {
         
         let result = "\(primary), \(secondary)".trimmingCharacters(in: .whitespacesAndNewlines)
         return result.isEmpty ? nil : result
+    }
+    
+    func applyFilters() {
+        worldPosts = postManager.filterPosts(
+            posts: worldPosts,
+            dateFilter: selectedDateFilter,
+            typeFilter: selectedTypeFilter
+        )
     }
 }
 

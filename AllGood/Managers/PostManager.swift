@@ -154,6 +154,46 @@ final class PostManager {
         return true
     }
     
+    func filterPosts(
+        posts: [Post],
+        dateFilter: PostDateFilter,
+        typeFilter: PostTypeFilter
+    ) -> [Post] {
+        let now = Date()
+        let calendar = Calendar.current
+        
+        return posts.filter { post in
+            var passesDate = false
+            var passesType = false
+            
+            switch dateFilter {
+            case .all:
+                passesDate = true
+            case .pastDay:
+                passesDate = post.timestamp >= calendar.date(byAdding: .day, value: -1, to: now)!
+            case .pastWeek:
+                passesDate = post.timestamp >= calendar.date(byAdding: .day, value: -7, to: now)!
+            case .pastMonth:
+                passesDate = post.timestamp >= calendar.date(byAdding: .month, value: -1, to: now)!
+            case .pastYear:
+                passesDate = post.timestamp >= calendar.date(byAdding: .year, value: -1, to: now)!
+            }
+            
+            switch typeFilter {
+            case .all:
+                passesType = true
+            case .donation:
+                passesType = post.type == .donation
+            case .volunteering:
+                passesType = post.type == .volunteering
+            case .kindness:
+                passesType = post.type == .kindness
+            }
+            
+            return passesDate && passesType
+        }
+    }
+
     // MARK: HELPERS
     
     private func calculateDistance(from: GeoPoint, to: GeoPoint) -> Double {

@@ -20,10 +20,15 @@ struct MapView: View {
     @State private var showLocationDeniedAlert = false
     
     @State private var showNewPostForm = false
+    
+    @State private var showFilterForm = false
+    @State private var selectedDateFilter: PostDateFilter = .all
+    @State private var selectedTypeFilter: PostTypeFilter = .all
+    
     @State private var selectedType: PostType? = nil
     @State private var message: String = ""
     @State private var canPost: Bool? = nil
-    var isFormValid: Bool {
+    var isPostFormValid: Bool {
         selectedType != nil &&
         !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -62,6 +67,7 @@ struct MapView: View {
             if !showNewPostForm && selectedPost == nil { floatingButtons }
 
             if showNewPostForm { newPostForm }
+            if showFilterForm { filterForm }
 
             if selectedPost != nil { tappedPostPopup }
         }
@@ -178,7 +184,7 @@ struct MapView: View {
                     .shadow(radius: 5)
             }
             
-            Button(action: { print("Filter tapped") }) {
+            Button(action: { showFilterForm = true }) {
                 Image(systemName: "slider.horizontal.3")
                     .font(.title)
                     .foregroundColor(.white)
@@ -236,6 +242,82 @@ struct MapView: View {
         }
     }
         
+    private var filterForm: some View {
+        ZStack {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture { withAnimation { showFilterForm = false } }
+            
+            VStack(spacing: 16) {
+                Text("Filter")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                
+                // date dropdown
+                Menu {
+                    ForEach(PostDateFilter.allCases, id: \.self) { filter in
+                        Button(filter.displayName) {
+                            selectedDateFilter = filter
+                        }
+                    }
+                } label: {
+                    HStack {
+                        Text(selectedDateFilter.displayName)
+                            .foregroundColor(.black)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+                }
+                
+                // type dropdown
+                Menu {
+                    ForEach(PostTypeFilter.allCases, id: \.self) { type in
+                        Button(type.displayName) { selectedTypeFilter = type }
+                    }
+                } label: {
+                    HStack {
+                        Text(selectedTypeFilter.displayName)
+                            .foregroundColor(.black)
+                        Spacer()
+                        Image(systemName: "chevron.down")
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+                }
+                
+                Button(action: {
+                    postViewModel.selectedDateFilter = selectedDateFilter
+                    postViewModel.selectedTypeFilter = selectedTypeFilter
+                    postViewModel.applyFilters()
+                    withAnimation { showFilterForm = false }
+                }) {
+                    Text("Apply Filters")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(theme.primary)
+                        .foregroundColor(.white)
+                        .cornerRadius(25)
+                }
+                .padding(.top, 4)
+                .frame(maxWidth: 160)
+            }
+            .padding(20)
+            .background(theme.secondary)
+            .cornerRadius(10)
+            .shadow(radius: 8)
+            .padding()
+        }
+    }
+
+
     private var typeDropdown: some View {
         Menu {
             ForEach(PostType.allCases, id: \.self) { type in
@@ -288,17 +370,17 @@ struct MapView: View {
                 .fontWeight(.semibold)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(isFormValid ? theme.primary : Color.gray.opacity(0.5))
+                .background(isPostFormValid ? theme.primary : Color.gray.opacity(0.5))
                 .foregroundColor(.white)
                 .cornerRadius(25)
         }
         .padding(.top, 4)
         .frame(maxWidth: 160)
-        .disabled(!isFormValid)
+        .disabled(!isPostFormValid)
     }
         
     private func handlePostButton() {
-        guard isFormValid else { return }
+        guard isPostFormValid else { return }
         
         switch locationManager.authorizationStatus {
         case .notDetermined:
@@ -340,8 +422,6 @@ struct MapView: View {
             break
         }
     }
-    
- 
 }
 
 #Preview {

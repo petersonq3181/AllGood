@@ -22,16 +22,16 @@ struct ProfileView: View {
                     HStack(spacing: 30) {
                         // profile picture placeholder
                         Circle()
-                            .fill(Color.gray.opacity(0.3))
+                            .fill(Color.white)
                             .frame(width: 80, height: 80)
                             .overlay(
-                                Image(systemName: "person.fill")
+                                Image("CustomIcon1")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 40, height: 40)
+                                    .frame(width: 55, height: 55)
                                     .foregroundColor(.white)
                             )
-                        
+
                         // username
                         Text("@\(user.username ?? "anonymous")")
                             .font(.title2)
@@ -151,5 +151,5 @@ struct ProfileView: View {
     let mockAuthVM = MockAuthenticationViewModel()
     let mockPostVM = MockPostViewModel()
     ProfileView(postViewModel: mockPostVM)
-        .environmentObject(mockAuthVM)
+        .environmentObject(mockAuthVM as AuthenticationViewModel)
 }

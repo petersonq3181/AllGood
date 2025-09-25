@@ -249,7 +249,7 @@ struct MapView: View {
                 .onTapGesture { withAnimation { showFilterForm = false } }
             
             VStack(spacing: 16) {
-                Text("Filter")
+                Text("Filter Posts")
                     .font(.title2)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
@@ -298,11 +298,11 @@ struct MapView: View {
                     postViewModel.applyFilters()
                     withAnimation { showFilterForm = false }
                 }) {
-                    Text("Apply Filters")
+                    Text("Filter")
                         .fontWeight(.semibold)
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(theme.primary)
+                        .background(theme.tertiary)
                         .foregroundColor(.white)
                         .cornerRadius(25)
                 }

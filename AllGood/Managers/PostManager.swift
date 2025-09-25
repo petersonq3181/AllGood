@@ -23,7 +23,7 @@ final class PostManager {
         description: String
     ) async throws -> Post {
         // create post
-        let post = Post(
+        var post = Post(
             userId: userId,
             userName: userName,
             type: type,
@@ -34,7 +34,8 @@ final class PostManager {
         // store
         let docRef = try db.collection(collection).addDocument(from: post)
         print("createPost Post created successfully with ID: \(docRef.documentID)")
-        
+        post.id = docRef.documentID
+
         // compute and update user's post streak and best in a single read-modify-write
         let userRef = db.collection("users").document(userId)
         let now = Date()

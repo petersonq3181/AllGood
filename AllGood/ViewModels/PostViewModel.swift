@@ -15,11 +15,13 @@ class PostViewModel: ObservableObject {
     // posts for current user
     @Published var userPosts: [Post] = []
     
-    // posts around the world
-//    @Published var worldPosts: [Post] = []
-    
-    @Published private var allWorldPosts: [Post] = [] // full dataset
+    @Published private var allWorldPosts: [Post] = [] { // full dataset
+        didSet {
+            applyFilters()
+        }
+    }
     @Published var worldPosts: [Post] = []            // filtered dataset
+    
 
     
     @Published var selectedDateFilter: PostDateFilter = .all
@@ -81,7 +83,7 @@ class PostViewModel: ObservableObject {
                 
                 isLoading = false
                 
-                worldPosts.append(newPost)
+                allWorldPosts.append(newPost)
                 
                 print("Post created successfully")
             } catch {

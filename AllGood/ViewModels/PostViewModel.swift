@@ -21,15 +21,13 @@ class PostViewModel: ObservableObject {
         }
     }
     @Published var worldPosts: [Post] = []            // filtered dataset
-    
-
+    @Published var selectedPostDetails: Post?
     
     @Published var selectedDateFilter: PostDateFilter = .all
     @Published var selectedTypeFilter: PostTypeFilter = .all
     
     @Published var isLoading = false
     @Published var errorMessage: String?
-    @Published var selectedPostDetails: Post?
     
     private let postManager: PostManager
     

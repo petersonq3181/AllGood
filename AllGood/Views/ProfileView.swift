@@ -140,6 +140,14 @@ struct ProfileView: View {
                     postViewModel.loadUserPosts(userId: user.uid)
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Sign Out") {
+                        authViewModel.signOut()
+                    }
+                    .foregroundColor(.white) // optional to match your theme
+                }
+            }
         }
         // attach this to the *content view* inside the tab
         .toolbarBackground(Color(theme.secondary), for: .tabBar)

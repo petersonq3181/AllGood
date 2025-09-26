@@ -136,6 +136,17 @@ class AuthenticationViewModel: ObservableObject {
             print("updateStreaksOnAppOpen error: \(error)")
         }
     }
+
+    func signOut() {
+        do {
+            try authManager.signOut()
+            userListenerRegistration?.remove()
+            userListenerRegistration = nil
+            self.user = nil
+        } catch {
+            print("signOut failed: \(error)")
+        }
+    }
 }
 
 #if DEBUG
@@ -148,5 +159,6 @@ final class MockAuthenticationViewModel: AuthenticationViewModel {
 
     // prevent hitting Firebase in previews/tests
     override func loadCurrentUser() async { }
+    override func signOut() { self.user = nil }
 }
 #endif

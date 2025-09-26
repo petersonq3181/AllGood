@@ -36,9 +36,30 @@
 		E47D22E42E6FAE6200C2BEA1 /* AllGoodUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AllGoodUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E4B0DE772E86F5A700867552 /* Exceptions for "AllGood" folder in "AllGood" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info-Test.plist",
+			);
+			target = E47D22C92E6FAE6000C2BEA1 /* AllGood */;
+		};
+		E4B0DE782E86F5A700867552 /* Exceptions for "AllGood" folder in "AllGoodTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"GoogleService-Info-Test.plist",
+			);
+			target = E47D22D92E6FAE6100C2BEA1 /* AllGoodTests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E47D22CC2E6FAE6000C2BEA1 /* AllGood */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E4B0DE772E86F5A700867552 /* Exceptions for "AllGood" folder in "AllGood" target */,
+				E4B0DE782E86F5A700867552 /* Exceptions for "AllGood" folder in "AllGoodTests" target */,
+			);
 			path = AllGood;
 			sourceTree = "<group>";
 		};

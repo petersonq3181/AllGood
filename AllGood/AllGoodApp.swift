@@ -12,7 +12,16 @@ import FirebaseFirestore
 @main
 struct AllGoodApp: App {
     init() {
-        FirebaseApp.configure()
+        if isRunningTests {
+            // load the test plist
+            if let filePath = Bundle.main.path(forResource: "GoogleService-Info-Test", ofType: "plist"),
+               let options = FirebaseOptions(contentsOfFile: filePath) {
+                FirebaseApp.configure(name: "test", options: options)
+            }
+        } else {
+            // default prod config (GoogleService-Info.plist)
+            FirebaseApp.configure()
+        }
     }
 
     @StateObject private var authViewModel = AuthenticationViewModel()
@@ -23,4 +32,8 @@ struct AllGoodApp: App {
                 .environmentObject(authViewModel)
         }
     }
+}
+
+var isRunningTests: Bool {
+    return NSClassFromString("XCTestCase") != nil
 }

@@ -11,7 +11,7 @@ import FirebaseFirestore
 
 class FirestoreManager {
     static var db: Firestore {
-        if let testApp = FirebaseApp.app(name: "test") {
+        if let testApp = FirebaseApp.app(name: "allgood-test") {
             return Firestore.firestore(app: testApp)
         } else {
             return Firestore.firestore()

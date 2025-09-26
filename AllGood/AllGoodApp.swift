@@ -12,16 +12,10 @@ import FirebaseFirestore
 @main
 struct AllGoodApp: App {
     init() {
-        if isRunningTests {
-            // load the test plist
-            if let filePath = Bundle.main.path(forResource: "GoogleService-Info-Test", ofType: "plist"),
-               let options = FirebaseOptions(contentsOfFile: filePath) {
-                FirebaseApp.configure(name: "test", options: options)
-            }
-        } else {
+//        if !isRunningTests {
             // default prod config (GoogleService-Info.plist)
-            FirebaseApp.configure()
-        }
+        FirebaseApp.configure()
+//        }
     }
 
     @StateObject private var authViewModel = AuthenticationViewModel()

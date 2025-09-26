@@ -11,7 +11,6 @@ import FirebaseAuth
 
 final class PostManager {
     
-    // private let db = Firestore.firestore()
     private let db = FirestoreManager.db
     
     private let collection = "posts"

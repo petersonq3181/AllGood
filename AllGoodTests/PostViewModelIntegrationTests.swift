@@ -15,22 +15,23 @@ final class PostViewModelIntegrationTests: XCTestCase {
         
     var db: Firestore!
     var collection: String!
-
+    let testAppName: String = "allgood-test"
+    
     override func setUp() {
         super.setUp()
 
         // configure Firebase test app only once
-        if FirebaseApp.app(name: "allgood-test") == nil {
+        if FirebaseApp.app(name: testAppName) == nil {
             if let filePath = Bundle(for: type(of: self)).path(forResource: "GoogleService-Info-Test", ofType: "plist"),
                let options = FirebaseOptions(contentsOfFile: filePath) {
-                FirebaseApp.configure(name: "allgood-test", options: options)
+                FirebaseApp.configure(name: testAppName, options: options)
             } else {
                 XCTFail("Could not load GoogleService-Info-Test.plist")
             }
         }
 
         // point Firestore to the test app
-        db = Firestore.firestore(app: FirebaseApp.app(name: "allgood-test")!)
+        db = Firestore.firestore(app: FirebaseApp.app(name: testAppName)!)
         collection = "posts"
     }
     
@@ -58,5 +59,4 @@ final class PostViewModelIntegrationTests: XCTestCase {
         XCTAssertNotNil(docRef)
         XCTAssertFalse(docRef.documentID.isEmpty)
     }
-    
 }

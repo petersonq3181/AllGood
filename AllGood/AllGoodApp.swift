@@ -12,10 +12,7 @@ import FirebaseFirestore
 @main
 struct AllGoodApp: App {
     init() {
-//        if !isRunningTests {
-            // default prod config (GoogleService-Info.plist)
         FirebaseApp.configure()
-//        }
     }
 
     @StateObject private var authViewModel = AuthenticationViewModel()
@@ -26,8 +23,4 @@ struct AllGoodApp: App {
                 .environmentObject(authViewModel)
         }
     }
-}
-
-var isRunningTests: Bool {
-    return NSClassFromString("XCTestCase") != nil
 }

@@ -33,6 +33,10 @@ struct MapView: View {
         !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
+    var isUserSetup: Bool {
+        authViewModel.hasValidUsername
+    }
+    
     @State private var selectedPost: Post? = nil
 
     @State private var bounds = MapCameraBounds(
@@ -176,14 +180,17 @@ struct MapView: View {
 
     private var floatingButtons: some View {
         VStack(spacing: 12) {
-            Button(action: { showNewPostForm = true }) {
-                Image(systemName: "plus")
-                    .font(.title)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.black.opacity(0.7))
-                    .clipShape(Circle())
-                    .shadow(radius: 5)
+            if isUserSetup {
+                Button(action: { showNewPostForm = true }) {
+                    Image(systemName: "plus")
+                        .font(.title)
+                        .foregroundColor(.white)
+                        .padding()
+                        .background(Color.black.opacity(0.7))
+                        .clipShape(Circle())
+                    
+                        .shadow(radius: 5)
+                }
             }
             
             Button(action: { showFilterForm = true }) {

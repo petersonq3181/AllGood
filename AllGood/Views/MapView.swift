@@ -164,7 +164,9 @@ struct MapView: View {
         }
         .onAppear {
             if let post = selectedPost {
-                postViewModel.fetchPostById(post.id ?? "")
+                Task {
+                    await postViewModel.fetchPostById(post.id ?? "")
+                } 
             }
         }
         .onDisappear {
@@ -403,14 +405,16 @@ struct MapView: View {
                         longitude: randomizedLoc.coordinate.longitude
                     )
 
-                    postViewModel.createPost(
-                        userId: authViewModel.user?.uid ?? "",
-                        userName: authViewModel.user?.username ?? "",
-                        type: selectedType ?? PostType.donation,
-                        location: geo,
-                        locationString: locationString ?? "",
-                        description: message
-                    )
+                    Task {
+                        await postViewModel.createPost(
+                            userId: authViewModel.user?.uid ?? "",
+                            userName: authViewModel.user?.username ?? "",
+                            type: selectedType ?? PostType.donation,
+                            location: geo,
+                            locationString: locationString ?? "",
+                            description: message
+                        )
+                    }
 
                     withAnimation { showNewPostForm = false }
                 }

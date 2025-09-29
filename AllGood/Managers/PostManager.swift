@@ -112,23 +112,13 @@ final class PostManager {
         return posts
     }
     
-    func fetchAllWorldPosts(completion: @escaping ([Post]) -> Void) {
-        db.collection("posts").getDocuments { snapshot, error in
-            if let error = error {
-                print("Error fetching posts: \(error)")
-                completion([])
-                return
-            }
-
-            let posts: [Post] = snapshot?.documents.compactMap { doc in
-                try? doc.data(as: Post.self)
-            } ?? []
-            
-            completion(posts)
+    func fetchAllWorldPosts() async throws -> [Post] {
+        let snapshot = try await db.collection("posts").getDocuments()
+        return snapshot.documents.compactMap { doc in
+            try? doc.data(as: Post.self)
         }
     }
 
-    
     func fetchPostById(_ id: String) async throws -> Post {
         let doc = try await db.collection(collection).document(id).getDocument()
         guard doc.exists else {

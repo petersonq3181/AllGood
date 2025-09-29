@@ -15,7 +15,7 @@ class PostViewModel: ObservableObject {
     // posts for current user
     @Published var userPosts: [Post] = []
     
-    @Published private var allWorldPosts: [Post] = [] { // full dataset
+    @Published private(set) var allWorldPosts: [Post] = [] { // full dataset
         didSet {
             applyFilters()
         }
@@ -26,7 +26,6 @@ class PostViewModel: ObservableObject {
     @Published var selectedDateFilter: PostDateFilter = .all
     @Published var selectedTypeFilter: PostTypeFilter = .all
     
-    @Published var isLoading = false
     @Published var errorMessage: String?
     
     private let postManager: PostManager
@@ -36,22 +35,22 @@ class PostViewModel: ObservableObject {
     }
     
     func loadUserPosts(userId: String) async {
-        isLoading = true
-        errorMessage = nil
         do {
             userPosts = try await postManager.fetchPostsByUser(userId: userId)
         } catch {
             errorMessage = error.localizedDescription
         }
-        isLoading = false
     }
     
-    func fetchAllPosts() {
-        postManager.fetchAllWorldPosts { [weak self] posts in
-            DispatchQueue.main.async {
-                self?.allWorldPosts = posts
-                self?.worldPosts = posts
-            }
+    func fetchAllPosts() async {
+        do {
+            let posts = try await postManager.fetchAllWorldPosts()
+            self.allWorldPosts = posts
+            self.worldPosts = posts
+        } catch {
+            print("Error fetching all posts: \(error)")
+            self.allWorldPosts = []
+            self.worldPosts = []
         }
     }
     
@@ -62,50 +61,50 @@ class PostViewModel: ObservableObject {
         location: GeoPoint,
         locationString: String,
         description: String
-    ) {
-        Task {
-            do {
-                isLoading = true
-                errorMessage = nil
-                let newPost: Post = try await postManager.createPost(
-                    userId: userId,
-                    userName: userName,
-                    type: type,
-                    location: location,
-                    locationString: locationString,
-                    description: description
-                )
-                
-                isLoading = false
-                
-                allWorldPosts.append(newPost)
-                
-                print("Post created successfully")
-            } catch {
-                isLoading = false
-                errorMessage = error.localizedDescription
-                print("Failed to create post: \(error)")
-            }
+    ) async {
+        do {
+            let newPost = try await postManager.createPost(
+                userId: userId,
+                userName: userName,
+                type: type,
+                location: location,
+                locationString: locationString,
+                description: description
+            )
+            
+            allWorldPosts.append(newPost)
+            print("Post created successfully")
+            
+        } catch {
+            errorMessage = error.localizedDescription
+            print("Failed to create post: \(error)")
         }
     }
     
-    func fetchPostById(_ id: String) {
-        Task {
-            do {
-                isLoading = true
-                errorMessage = nil
-                let post = try await postManager.fetchPostById(id)
-                selectedPostDetails = post
-                isLoading = false
-            } catch {
-                errorMessage = error.localizedDescription
-                isLoading = false
-            }
+    func fetchPostById(_ id: String) async {
+        guard !id.isEmpty else {
+            errorMessage = "Post ID cannot be empty"
+            selectedPostDetails = nil
+            return
+        }
+
+        errorMessage = nil
+        do {
+            let post = try await postManager.fetchPostById(id)
+            selectedPostDetails = post
+        } catch {
+            errorMessage = error.localizedDescription
+            selectedPostDetails = nil
         }
     }
     
     // returns true if the user is allowed to post (hasn't posted in the last 24 hours)
     func userCanPost(userId: String) async -> Bool {
+        guard !userId.isEmpty else {
+            errorMessage = "User ID cannot be empty"
+            return false
+        }
+        
         do {
             return try await postManager.userCanPost(userId: userId)
         } catch {
@@ -124,7 +123,10 @@ class PostViewModel: ObservableObject {
         let primary = parts.count > 1 ? parts[1] : parts.first ?? ""
         let secondary = parts.count > 2 ? parts[2] : parts.last ?? ""
         
-        let result = "\(primary), \(secondary)".trimmingCharacters(in: .whitespacesAndNewlines)
+        let result = "\(primary), \(secondary)"
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .trimmingCharacters(in: CharacterSet(charactersIn: ","))
+
         return result.isEmpty ? nil : result
     }
     
@@ -147,6 +149,6 @@ final class MockPostViewModel: PostViewModel {
     
     // disable networking in previews
     override func loadUserPosts(userId: String) async { }
-    override func fetchAllPosts() { }
+    override func fetchAllPosts() async { }
 }
 #endif

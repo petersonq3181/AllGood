@@ -26,7 +26,9 @@ struct RootView: View {
                             Text("Map")
                         }
                         .onAppear {
-                            postViewModel.fetchAllPosts()
+                            Task {
+                                await postViewModel.fetchAllPosts()
+                            }
                         }
                     
                     ProfileView(postViewModel: postViewModel)

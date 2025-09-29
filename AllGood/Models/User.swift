@@ -19,9 +19,10 @@ struct User: Codable {
     var streakAppBest: Int
     var streakPost: Int
     var streakPostBest: Int
+    var avatarNumber: Int
     
     init(uid: String, isAnonymous: Bool = true, username: String? = nil,
-         streakApp: Int = 0, streakAppBest: Int = 0, streakPost: Int = 0, streakPostBest: Int = 0) {
+         streakApp: Int = 0, streakAppBest: Int = 0, streakPost: Int = 0, streakPostBest: Int = 0, avatarNumber: Int = 0) {
         
         let calendar = Calendar.current
         let components = DateComponents(year: 2000, month: 1, day: 1)
@@ -37,6 +38,7 @@ struct User: Codable {
         self.streakAppBest = streakAppBest
         self.streakPost = streakPost
         self.streakPostBest = streakPostBest
+        self.avatarNumber = avatarNumber
     }
 
     enum CodingKeys: String, CodingKey {
@@ -50,6 +52,7 @@ struct User: Codable {
         case streakAppBest
         case streakPost
         case streakPostBest
+        case avatarNumber
     }
 
     init(from decoder: Decoder) throws {
@@ -68,6 +71,7 @@ struct User: Codable {
         streakAppBest = (try? container.decode(Int.self, forKey: .streakAppBest)) ?? 0
         streakPost = (try? container.decode(Int.self, forKey: .streakPost)) ?? 0
         streakPostBest = (try? container.decode(Int.self, forKey: .streakPostBest)) ?? 0
+        avatarNumber = (try? container.decode(Int.self, forKey: .avatarNumber)) ?? 0
     }
 
     func encode(to encoder: Encoder) throws {
@@ -82,6 +86,7 @@ struct User: Codable {
         try container.encode(streakAppBest, forKey: .streakAppBest)
         try container.encode(streakPost, forKey: .streakPost)
         try container.encode(streakPostBest, forKey: .streakPostBest)
+        try container.encode(avatarNumber, forKey: .avatarNumber)
     }
 }
 
@@ -89,8 +94,8 @@ struct User: Codable {
 #if DEBUG
 extension User {
     static var mock: User {
-        User(uid: "123", isAnonymous: false, username: "anon",
-             streakApp: 9, streakAppBest: 9, streakPost: 3, streakPostBest: 5)
+        User(uid: "123", isAnonymous: false, username: "",
+             streakApp: 1, streakAppBest: 1, streakPost: 0, streakPostBest: 0, avatarNumber: 0)
     }
 }
 #endif

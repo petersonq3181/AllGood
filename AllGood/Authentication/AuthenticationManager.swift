@@ -39,6 +39,23 @@ final class AuthenticationManager {
     func signOut() throws {
         try Auth.auth().signOut()
     }
+    
+    func setupProfile(username: String, avatarNumber: Int) async throws {
+        guard let user = Auth.auth().currentUser else {
+            // lazy for now could throw diff error
+            throw URLError(.badServerResponse)
+        }
+        
+        let data: [String: Any] = [
+            "username": username.trimmingCharacters(in: .whitespacesAndNewlines),
+            "avatarNumber": avatarNumber
+        ]
+        
+        try await Firestore.firestore()
+            .collection("users")
+            .document(user.uid)
+            .setData(data, merge: true)
+    }
 }
 
 // MARK: SIGN IN ANONYMOUS

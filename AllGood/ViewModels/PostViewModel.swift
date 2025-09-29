@@ -65,7 +65,7 @@ class PostViewModel: ObservableObject {
         do {
             let newPost = try await postManager.createPost(
                 userId: userId,
-                userName: userName,
+                userName: (userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? userName : "anonymous"),
                 type: type,
                 location: location,
                 locationString: locationString,

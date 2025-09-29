@@ -8,6 +8,11 @@ private var userListenerRegistration: ListenerRegistration?
 class AuthenticationViewModel: ObservableObject {
     @Published var user: User? = nil
     
+    var hasValidUsername: Bool {
+        guard let username = user?.username else { return false }
+        return !username.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
     private let authManager = AuthenticationManager(db: FirestoreManager.db)
     
     init() {
@@ -145,6 +150,14 @@ class AuthenticationViewModel: ObservableObject {
             self.user = nil
         } catch {
             print("signOut failed: \(error)")
+        }
+    }
+    
+    func setupProfile(username: String, avatarNumber: Int) async {
+        do {
+            try await authManager.setupProfile(username: username, avatarNumber: avatarNumber)
+        } catch {
+            print("Failed to setup profile: \(error.localizedDescription)")
         }
     }
 }

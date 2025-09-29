@@ -166,7 +166,7 @@ struct MapView: View {
             if let post = selectedPost {
                 Task {
                     await postViewModel.fetchPostById(post.id ?? "")
-                } 
+                }
             }
         }
         .onDisappear {

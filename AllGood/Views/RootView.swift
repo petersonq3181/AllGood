@@ -35,7 +35,8 @@ struct RootView: View {
                         .environment(\.colorTheme, theme)
                         .environmentObject(authViewModel)
                         .tabItem {
-                            Image(systemName: "person")
+                            Image("CustomIcon\(user.avatarNumber)Tab")
+                                .renderingMode(.original)
                             Text("Profile")
                         }
                 }

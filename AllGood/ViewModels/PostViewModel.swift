@@ -57,6 +57,7 @@ class PostViewModel: ObservableObject {
     func createPost(
         userId: String,
         userName: String,
+        avatarNumber: Int,
         type: PostType,
         location: GeoPoint,
         locationString: String,
@@ -66,6 +67,7 @@ class PostViewModel: ObservableObject {
             let newPost = try await postManager.createPost(
                 userId: userId,
                 userName: (userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? userName : "anonymous"),
+                avatarNumber: avatarNumber,
                 type: type,
                 location: location,
                 locationString: locationString,

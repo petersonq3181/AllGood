@@ -61,6 +61,7 @@ struct Post: Codable, Identifiable {
     @DocumentID var id: String?
     let userId: String
     let userName: String
+    let avatarNumber: Int?
     let type: PostType
     let timestamp: Date
     let location: GeoPoint
@@ -78,6 +79,7 @@ struct Post: Codable, Identifiable {
         id: String? = nil,
         userId: String,
         userName: String,
+        avatarNumber: Int,
         type: PostType,
         location: GeoPoint,
         locationString: String,
@@ -86,6 +88,7 @@ struct Post: Codable, Identifiable {
         self.id = id
         self.userId = userId
         self.userName = userName
+        self.avatarNumber = avatarNumber
         self.type = type
         self.timestamp = Date()
         self.location = location
@@ -101,7 +104,8 @@ extension Post {
         [
             Post(id: "mock1",
                  userId: "123",
-                 userName: "anon",
+                 userName: "SuperLongUsernameLol",
+                 avatarNumber: 1,
                  type: .donation,
                  location: GeoPoint(latitude: 33.2, longitude: -117.25),
                  locationString: "Capitol Hill, San Francisco, CA, United States",
@@ -109,6 +113,7 @@ extension Post {
             Post(id: "mock2",
                  userId: "123",
                  userName: "anon",
+                 avatarNumber: 5,
                  type: .donation,
                  location: GeoPoint(latitude: 33.2, longitude: -117.25),
                  locationString: "Capitol Hill, San Francisco, CA, United States",

@@ -22,6 +22,7 @@ final class PostManager {
     func createPost(
         userId: String,
         userName: String,
+        avatarNumber: Int,
         type: PostType,
         location: GeoPoint,
         locationString: String,
@@ -31,6 +32,7 @@ final class PostManager {
         var post = Post(
             userId: userId,
             userName: userName,
+            avatarNumber: avatarNumber,
             type: type,
             location: location,
             locationString: locationString,

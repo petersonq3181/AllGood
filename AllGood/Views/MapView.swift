@@ -132,21 +132,31 @@ struct MapView: View {
                     Text(details.description)
                         .font(.body)
                         .multilineTextAlignment(.leading)
-                        .lineLimit(4)
+                        .lineLimit(6)
                         .truncationMode(.tail)
                         .padding(.top, 12)
 
                     Spacer(minLength: 0)
 
                     HStack(spacing: 6) {
-                        Text("Post from")
+                        Text("Post from @\(details.userName)")
                             .font(.body)
                             .foregroundColor(.primary)
-                        Text("@\(details.userName)")
-                            .font(.body)
-                            .foregroundColor(theme.tertiary)
-                            .lineLimit(1)
+                            .lineLimit(2)
                             .truncationMode(.tail)
+                        
+                        Spacer() // pushes the circle to the far right
+                        
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 80, height: 80) 
+                            .overlay(
+                                Image("CustomIcon\(details.avatarNumber ?? 1)")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 75, height: 75)
+                                    .foregroundColor(.white)
+                            )
                     }
                     .padding(.bottom, 4)
                 } else {
@@ -416,6 +426,7 @@ struct MapView: View {
                         await postViewModel.createPost(
                             userId: authViewModel.user?.uid ?? "",
                             userName: authViewModel.user?.username ?? "",
+                            avatarNumber: authViewModel.user?.avatarNumber ?? 1,
                             type: selectedType ?? PostType.donation,
                             location: geo,
                             locationString: locationString ?? "",

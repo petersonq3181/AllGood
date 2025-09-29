@@ -10,45 +10,56 @@ import FirebaseFirestore
 
 struct MockPostPopup: View {
     @Environment(\.colorTheme) var theme
-    let post: Post
+    let details: Post
     
     let postViewModel: PostViewModel = PostViewModel(postManager: PostManager(db: FirestoreManager.db))
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if let formatted = postViewModel.formattedLocation(for: post) {
+            if let formatted = postViewModel.formattedLocation(for: details) {
                 Text(formatted)
                     .font(.title2)
                     .fontWeight(.bold)
             }
             
-            Text(post.timestamp.formatted(date: .long, time: .omitted))
+            Text(details.timestamp.formatted(date: .long, time: .omitted))
                 .font(.body)
 
-            Text(post.type.displayName)
+            Text(details.type.displayName)
                 .font(.body)
                 .foregroundColor(theme.quaternary)
 
-            Text(post.description)
+            Text(details.description)
                 .font(.body)
                 .multilineTextAlignment(.leading)
-                .lineLimit(4)
+                .lineLimit(6)
                 .truncationMode(.tail)
                 .padding(.top, 12)
 
             Spacer(minLength: 0)
 
             HStack(spacing: 6) {
-                Text("Post from")
+                Text("Post from @\(details.userName)")
                     .font(.body)
                     .foregroundColor(.primary)
-                Text("@\(post.userName)")
-                    .font(.body)
-                    .foregroundColor(theme.tertiary)
-                    .lineLimit(1)
+                    .lineLimit(2)
                     .truncationMode(.tail)
+                
+                Spacer() // pushes the circle to the far right
+
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 80, height: 80)
+                    .overlay(
+                        Image("CustomIcon\(details.avatarNumber ?? 1)")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 75, height: 75)
+                            .foregroundColor(.white)
+                    )
             }
             .padding(.bottom, 4)
+
         }
         .frame(maxWidth: .infinity, alignment: .leading) // force to left
         .padding(.horizontal, 25)
@@ -62,5 +73,5 @@ struct MockPostPopup: View {
 
 #Preview {
     let mock = Post.mockPosts.first!
-    MockPostPopup(post: mock)
+    MockPostPopup(details: mock)
 }

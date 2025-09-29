@@ -83,6 +83,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         await postViewModel.createPost(
             userId: userId,
             userName: "mrstar",
+            avatarNumber: 4,
             type: PostType.kindness,
             location: GeoPoint(latitude: 37.74685454889474, longitude: 122.39506747538778),
             locationString: "Capitol Hill, San Francisco, CA, U.S.",
@@ -155,6 +156,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         let post = Post(
             userId: "1",
             userName: "Test",
+            avatarNumber: 5,
             type: .kindness,
             location: GeoPoint(latitude: 0, longitude: 0),
             locationString: "Neighborhood, City, State, Country",
@@ -169,6 +171,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         let post1 = Post(
             userId: "1",
             userName: "Test",
+            avatarNumber: 5,
             type: .kindness,
             location: GeoPoint(latitude: 0, longitude: 0),
             locationString: "City",
@@ -179,6 +182,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         let post2 = Post(
             userId: "1",
             userName: "Test",
+            avatarNumber: 5,
             type: .kindness,
             location: GeoPoint(latitude: 0, longitude: 0),
             locationString: "City, State",
@@ -191,6 +195,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         let post1 = Post(
             userId: "1",
             userName: "Test",
+            avatarNumber: 5,
             type: .kindness,
             location: GeoPoint(latitude: 0, longitude: 0),
             locationString: "",
@@ -201,6 +206,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         let post2 = Post(
             userId: "1",
             userName: "Test",
+            avatarNumber: 5,
             type: .kindness,
             location: GeoPoint(latitude: 0, longitude: 0),
             locationString: "   ",

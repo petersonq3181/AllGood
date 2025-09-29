@@ -228,6 +228,11 @@ struct ProfileView: View {
                     .padding()
                     .background(Color(.systemGray6))
                     .cornerRadius(10)
+                    .onChange(of: newUsername) { _, newValue in
+                        if newValue.count > 15 {
+                            newUsername = String(newValue.prefix(15))
+                        }
+                    }
                 
                 Text("Username will be permanent")
                     .font(.footnote)

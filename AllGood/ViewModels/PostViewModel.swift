@@ -144,7 +144,7 @@ class PostViewModel: ObservableObject {
 final class MockPostViewModel: PostViewModel {
     init(posts: [Post] = Post.mockPosts) {
         // don’t call Firestore-backed init, just inject a dummy manager
-        super.init(postManager: PostManager())
+        super.init(postManager: PostManager(db: FirestoreManager.db))
         self.userPosts = userPosts
     }
     

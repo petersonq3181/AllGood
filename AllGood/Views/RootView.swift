@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RootView: View {
-    @StateObject private var postViewModel = PostViewModel(postManager: PostManager())
+    @StateObject private var postViewModel = PostViewModel(postManager: PostManager(db: FirestoreManager.db))
 
     @EnvironmentObject var authViewModel: AuthenticationViewModel
     

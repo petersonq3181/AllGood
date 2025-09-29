@@ -11,9 +11,13 @@ import FirebaseAuth
 
 final class PostManager {
     
-    private let db = FirestoreManager.db
+    private let db: Firestore
+    private let collection: String
     
-    private let collection = "posts"
+    init(db: Firestore) {
+        self.db = db
+        self.collection = "posts"
+    }
         
     func createPost(
         userId: String,

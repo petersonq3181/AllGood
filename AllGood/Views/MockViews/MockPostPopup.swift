@@ -12,7 +12,7 @@ struct MockPostPopup: View {
     @Environment(\.colorTheme) var theme
     let post: Post
     
-    let postViewModel: PostViewModel = PostViewModel(postManager: PostManager())
+    let postViewModel: PostViewModel = PostViewModel(postManager: PostManager(db: FirestoreManager.db))
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {

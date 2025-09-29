@@ -19,7 +19,11 @@ struct AuthDataResultModel {
 
 final class AuthenticationManager {
     
-    private let db = FirestoreManager.db
+    private let db: Firestore
+    
+    init(db: Firestore) {
+        self.db = db
+    }
     
     func getAuthenticatedUser() throws -> AuthDataResultModel {
         guard let user = Auth.auth().currentUser else {

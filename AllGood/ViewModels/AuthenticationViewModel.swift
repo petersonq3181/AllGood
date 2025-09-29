@@ -8,7 +8,7 @@ private var userListenerRegistration: ListenerRegistration?
 class AuthenticationViewModel: ObservableObject {
     @Published var user: User? = nil
     
-    private let authManager = AuthenticationManager()
+    private let authManager = AuthenticationManager(db: FirestoreManager.db)
     
     init() {
         Task {

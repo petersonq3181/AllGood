@@ -40,7 +40,7 @@ class AuthenticationViewModel: ObservableObject {
     }
     
     private func fetchUserDocument(uid: String) async {
-        let db = Firestore.firestore()
+        let db = FirestoreManager.db
         
         do {
             let document = try await db.collection("users").document(uid).getDocument()
@@ -65,7 +65,7 @@ class AuthenticationViewModel: ObservableObject {
         // remove any existing listener before adding a new one
         userListenerRegistration?.remove()
         
-        let db = Firestore.firestore()
+        let db = FirestoreManager.db
         userListenerRegistration = db.collection("users").document(uid).addSnapshotListener { [weak self] snapshot, error in
             guard let self = self else { return }
             if let error = error {
@@ -85,7 +85,7 @@ class AuthenticationViewModel: ObservableObject {
     }
 
     private func updateStreaksOnAppOpen(uid: String) async {
-        let db = Firestore.firestore()
+        let db = FirestoreManager.db
         let userRef = db.collection("users").document(uid)
         do {
             let snapshot = try await userRef.getDocument()

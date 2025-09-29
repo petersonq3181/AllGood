@@ -137,7 +137,9 @@ struct ProfileView: View {
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
                 if let user = authViewModel.user {
-                    postViewModel.loadUserPosts(userId: user.uid)
+                    Task {
+                        await postViewModel.loadUserPosts(userId: user.uid)
+                    }
                 }
             }
             .toolbar {

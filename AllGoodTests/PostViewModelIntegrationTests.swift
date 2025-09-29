@@ -11,16 +11,20 @@ import XCTest
 import Firebase
 import FirebaseFirestore
 
+// assumes test DB populated with specific test data (see DB dump)
+
+@MainActor
 final class PostViewModelIntegrationTests: XCTestCase {
         
     var db: Firestore!
     var collection: String!
     let testAppName: String = "allgood-test"
     
+    var postViewModel: PostViewModel!
+    
     override func setUp() {
         super.setUp()
 
-        // configure Firebase test app only once
         if FirebaseApp.app(name: testAppName) == nil {
             if let filePath = Bundle(for: type(of: self)).path(forResource: "GoogleService-Info-Test", ofType: "plist"),
                let options = FirebaseOptions(contentsOfFile: filePath) {
@@ -30,33 +34,26 @@ final class PostViewModelIntegrationTests: XCTestCase {
             }
         }
 
-        // point Firestore to the test app
         db = Firestore.firestore(app: FirebaseApp.app(name: testAppName)!)
         collection = "posts"
+        FirestoreManager.setTestDB(db)
+
+        let postManager = PostManager(db: FirestoreManager.db)
+        postViewModel = PostViewModel(postManager: postManager)
     }
     
     override func tearDown() {
         db = nil
         collection = nil
+        postViewModel = nil
         super.tearDown()
     }
     
     // MARK: - Tests
     
-    func test_GG() throws {
-        // create post
-        let post = Post(
-            userId: "KhdhNU2o6bOuqtyj0GehbbKJUTx2",
-            userName: "anon",
-            type: PostType.kindness,
-            location: GeoPoint(latitude: 37.74685454889474, longitude: 122.39506747538778),
-            locationString: "Capitol Hill, San Francisco, CA, United States",
-            description: "An act of kindness."
-        )
-        // store
-        let docRef = try db.collection(collection).addDocument(from: post)
+    func testLoadUserPosts_withValidUser_returnPosts() async throws {
+        await postViewModel.loadUserPosts(userId: "LPOjPKzvFNOOlGlzcqJB66VBt4v1")
         
-        XCTAssertNotNil(docRef)
-        XCTAssertFalse(docRef.documentID.isEmpty)
+        XCTAssertFalse(postViewModel.userPosts.isEmpty)
     }
 }

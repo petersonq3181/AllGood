@@ -35,18 +35,15 @@ class PostViewModel: ObservableObject {
         self.postManager = postManager
     }
     
-    func loadUserPosts(userId: String) {
-        Task {
-            do {
-                isLoading = true
-                errorMessage = nil
-                userPosts = try await postManager.fetchPostsByUser(userId: userId)
-                isLoading = false
-            } catch {
-                errorMessage = error.localizedDescription
-                isLoading = false
-            }
+    func loadUserPosts(userId: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            userPosts = try await postManager.fetchPostsByUser(userId: userId)
+        } catch {
+            errorMessage = error.localizedDescription
         }
+        isLoading = false
     }
     
     func fetchAllPosts() {
@@ -149,7 +146,7 @@ final class MockPostViewModel: PostViewModel {
     }
     
     // disable networking in previews
-    override func loadUserPosts(userId: String) { }
+    override func loadUserPosts(userId: String) async { }
     override func fetchAllPosts() { }
 }
 #endif

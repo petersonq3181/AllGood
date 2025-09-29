@@ -9,12 +9,12 @@ import Foundation
 import FirebaseCore
 import FirebaseFirestore
 
-class FirestoreManager {
-    static var db: Firestore {
-        if let testApp = FirebaseApp.app(name: "allgood-test") {
-            return Firestore.firestore(app: testApp)
-        } else {
-            return Firestore.firestore()
-        }
+final class FirestoreManager {
+    static var sharedDB: Firestore = Firestore.firestore() // production default
+
+    static func setTestDB(_ db: Firestore) {
+        sharedDB = db
     }
+
+    static var db: Firestore { sharedDB }
 }

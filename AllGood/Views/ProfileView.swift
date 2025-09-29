@@ -25,10 +25,10 @@ struct ProfileView: View {
                             .fill(Color.white)
                             .frame(width: 80, height: 80)
                             .overlay(
-                                Image("CustomIcon1")
+                                Image("CustomIcon5")
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 55, height: 55)
+                                    .frame(width: 75, height: 75)
                                     .foregroundColor(.white)
                             )
 

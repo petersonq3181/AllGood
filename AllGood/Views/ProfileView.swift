@@ -17,9 +17,14 @@ struct ProfileView: View {
     @State private var showUserSetupPopup: Bool = false
     @State private var selectedIconNumber: Int = 0
     @State private var newUsername: String = ""
-    private var isFormValid: Bool {
+    private var isSetupUserFormValid: Bool {
         selectedIconNumber > 0 &&
         !newUsername.trimmingCharacters(in: .whitespaces).isEmpty
+    }
+    
+    @State private var showUserUpdatePopup: Bool = false
+    private var isUpdateUserFormValid: Bool {
+        selectedIconNumber > 0
     }
     
     var body: some View {
@@ -28,13 +33,17 @@ struct ProfileView: View {
                 if let user = authViewModel.user {
  
                     if authViewModel.hasValidUsername {
-                        profileSection(user: user)
-                        
-                        // streak section
-                        streakSection(user: user)
-                        
-                        // scrollable posts section
-                        postSection(user: user)
+                        if showUserUpdatePopup {
+                            updateUserForm(user: user)
+                        } else {
+                            profileSection(user: user)
+                            
+                            // streak section
+                            streakSection(user: user)
+                            
+                            // scrollable posts section
+                            postSection(user: user)
+                        }
                     } else {
                         if !showUserSetupPopup {
                             setupProfileSection(user: user)
@@ -58,11 +67,21 @@ struct ProfileView: View {
                 }
             }
             .toolbar {
+                // Saved temporarily and commented -- helpful to Sign Out
+                // for User - sign-up flow testing
+//                ToolbarItem(placement: .navigationBarTrailing) {
+//                    Button("Sign Out") {
+//                        authViewModel.signOut()
+//                    }
+//                    .foregroundColor(.white) // optional to match your theme
+//                }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Sign Out") {
-                        authViewModel.signOut()
+                    Button(action: {
+                        showUserUpdatePopup = true
+                    }) {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.white) // keep theme color
                     }
-                    .foregroundColor(.white) // optional to match your theme
                 }
             }
         }
@@ -252,10 +271,10 @@ struct ProfileView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 30)
                         .padding(.vertical, 12)
-                        .background(isFormValid ? theme.tertiary : Color.gray.opacity(0.5))
+                        .background(isSetupUserFormValid ? theme.tertiary : Color.gray.opacity(0.5))
                         .cornerRadius(10)
                 }
-                .disabled(!isFormValid)
+                .disabled(!isSetupUserFormValid)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(24)
@@ -263,6 +282,59 @@ struct ProfileView: View {
             .background(Color.white)
             .cornerRadius(20)
             .shadow(radius: 10)
+        }
+    }
+    
+    private func updateUserForm(user: User) -> some View {
+        ZStack {
+            Color.black.opacity(0.3)
+                .ignoresSafeArea()
+                .onTapGesture { withAnimation { showUserUpdatePopup = false } }
+            
+            VStack(spacing: 20) {
+                Text("Select Avatar")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                // grid of avatars (FOW NOW JUST 2 rows x 3 cols)
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 20), count: 3), spacing: 20) {
+                    ForEach(1..<7) { index in
+                        avatarCircle(index: index)
+                    }
+                }
+                
+                Button(action: {
+                    Task {
+                        await authViewModel.updateAvatar(avatarNumber: selectedIconNumber)
+                    }
+                    
+                    withAnimation {
+                        showUserUpdatePopup = false
+                    }
+                }) {
+                    Text("Update")
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 30)
+                        .padding(.vertical, 12)
+                        .background(isUpdateUserFormValid ? theme.tertiary : Color.gray.opacity(0.5))
+                        .cornerRadius(10)
+                }
+                .disabled(!isUpdateUserFormValid)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(24)
+            .frame(width: 320)
+            .background(Color.white)
+            .cornerRadius(20)
+            .shadow(radius: 10)
+            .onAppear {
+                // pre-fill with user’s current avatar
+                if selectedIconNumber == 0 {
+                    selectedIconNumber = user.avatarNumber
+                }
+            }
         }
     }
     

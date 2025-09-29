@@ -56,6 +56,22 @@ final class AuthenticationManager {
             .document(user.uid)
             .setData(data, merge: true)
     }
+    
+    func updateAvatar(avatarNumber: Int) async throws {
+        guard let user = Auth.auth().currentUser else {
+            // lazy for now could throw diff error
+            throw URLError(.badServerResponse)
+        }
+        
+        let data: [String: Any] = [
+            "avatarNumber": avatarNumber
+        ]
+        
+        try await Firestore.firestore()
+            .collection("users")
+            .document(user.uid)
+            .setData(data, merge: true)
+    }
 }
 
 // MARK: SIGN IN ANONYMOUS

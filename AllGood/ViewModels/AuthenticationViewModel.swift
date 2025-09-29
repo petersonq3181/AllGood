@@ -160,6 +160,14 @@ class AuthenticationViewModel: ObservableObject {
             print("Failed to setup profile: \(error.localizedDescription)")
         }
     }
+    
+    func updateAvatar(avatarNumber: Int) async {
+        do {
+            try await authManager.updateAvatar(avatarNumber: avatarNumber)
+        } catch {
+            print("Failed to update profile: \(error.localizedDescription)")
+        }
+    }
 }
 
 #if DEBUG

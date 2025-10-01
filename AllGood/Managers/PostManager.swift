@@ -28,6 +28,13 @@ final class PostManager {
         locationString: String,
         description: String
     ) async throws -> Post {
+        
+        let isAllowed = try await TextModerator.checkText(description)
+        
+        if !isAllowed {
+            throw NSError(domain: "PostManager", code: 1001, userInfo: [NSLocalizedDescriptionKey : "Your post contains inappropriate language."])
+        }
+           
         // create post
         var post = Post(
             userId: userId,

@@ -103,6 +103,26 @@ final class PostViewModelIntegrationTests: XCTestCase {
         XCTAssertTrue(Calendar.current.isDateInToday(userLastPost), "Expected user.lastPost to be today, but it was \(userLastPost)")
     }
     
+    func testCreatePost_withInnappropriateData_returnNil() async throws {
+        let userId = "KhdhNU2o6bOuqtyj0GehbbKJUTx2"
+        let description = "Donated a punch to someone's face"
+        
+        await postViewModel.createPost(
+            userId: userId,
+            userName: "MrStar",
+            avatarNumber: 1,
+            type: .donation,
+            location: GeoPoint(latitude: 0, longitude: 0),
+            locationString: "Capitol Hill, San Francisco, CA, U.S.",
+            description: description
+        )
+
+        // Assert
+        XCTAssertEqual(postViewModel.allWorldPosts.count, 0, "No post should be added")
+        XCTAssertEqual(postViewModel.errorMessage, "Your post contains inappropriate language.", "Error message should be set")
+    }
+
+    
     func testFetchPostById_withValidId_returnPost() async throws {
         XCTAssertNil(postViewModel.selectedPostDetails)
         

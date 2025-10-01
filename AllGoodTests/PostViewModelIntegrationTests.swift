@@ -80,7 +80,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         var user = try document.data(as: User.self)
         let streakPostBest = user.streakPostBest
         
-        await postViewModel.createPost(
+        let _ = await postViewModel.createPost(
             userId: userId,
             userName: "mrstar",
             avatarNumber: 4,
@@ -107,7 +107,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         let userId = "KhdhNU2o6bOuqtyj0GehbbKJUTx2"
         let description = "Donated a punch to someone's face"
         
-        await postViewModel.createPost(
+        let post = await postViewModel.createPost(
             userId: userId,
             userName: "MrStar",
             avatarNumber: 1,
@@ -118,6 +118,7 @@ final class PostViewModelIntegrationTests: XCTestCase {
         )
 
         // Assert
+        XCTAssertNil(post)
         XCTAssertEqual(postViewModel.allWorldPosts.count, 0, "No post should be added")
         XCTAssertEqual(postViewModel.errorMessage, "Your post contains inappropriate language.", "Error message should be set")
     }

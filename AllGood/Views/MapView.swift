@@ -234,6 +234,7 @@ struct MapView: View {
                         typeDropdown
                         messageField
                         postLocationNote
+                        if (postViewModel.errorMessage != nil) { postErrorNote }
                         postButton
                     } else {
                         VStack {
@@ -382,6 +383,14 @@ struct MapView: View {
             .multilineTextAlignment(.center)
             .padding(.horizontal)
     }
+    
+    private var postErrorNote: some View {
+        Text(postViewModel.errorMessage ?? "")
+            .font(.footnote)
+            .foregroundColor(.gray)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal)
+    }
         
     private var postButton: some View {
         Button(action: handlePostButton) {
@@ -421,9 +430,9 @@ struct MapView: View {
                         latitude: randomizedLoc.coordinate.latitude,
                         longitude: randomizedLoc.coordinate.longitude
                     )
-
+                    
                     Task {
-                        await postViewModel.createPost(
+                        let post = await postViewModel.createPost(
                             userId: authViewModel.user?.uid ?? "",
                             userName: authViewModel.user?.username ?? "",
                             avatarNumber: authViewModel.user?.avatarNumber ?? 1,
@@ -432,9 +441,15 @@ struct MapView: View {
                             locationString: locationString ?? "",
                             description: message
                         )
+                        if post == nil {
+                            // View can read postViewModel.errorMessage
+                            
+                        } else {
+                            message = ""
+                            selectedType = nil
+                            withAnimation { showNewPostForm = false }
+                        }
                     }
-
-                    withAnimation { showNewPostForm = false }
                 }
             }
             

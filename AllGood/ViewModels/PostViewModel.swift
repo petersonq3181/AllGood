@@ -62,8 +62,15 @@ class PostViewModel: ObservableObject {
         location: GeoPoint,
         locationString: String,
         description: String
-    ) async {
+    ) async -> Post? {
         do {
+            
+            let isAllowed = try await TextModerator.checkText(description)
+            
+            guard isAllowed else {
+                throw PostError.inappropriateContent
+            }
+            
             let newPost = try await postManager.createPost(
                 userId: userId,
                 userName: (userName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? userName : "anonymous"),
@@ -76,10 +83,12 @@ class PostViewModel: ObservableObject {
             
             allWorldPosts.append(newPost)
             print("Post created successfully")
+            return newPost
             
         } catch {
             errorMessage = error.localizedDescription
             print("Failed to create post: \(error)")
+            return nil
         }
     }
     
@@ -138,6 +147,20 @@ class PostViewModel: ObservableObject {
             dateFilter: selectedDateFilter,
             typeFilter: selectedTypeFilter
         )
+    }
+}
+
+enum PostError: LocalizedError {
+    case inappropriateContent
+    case unknown(Error)
+    
+    var errorDescription: String? {
+        switch self {
+        case .inappropriateContent:
+            return "Your post contains inappropriate language."
+        case .unknown(let error):
+            return error.localizedDescription
+        }
     }
 }
 

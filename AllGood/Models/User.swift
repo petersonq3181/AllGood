@@ -22,7 +22,7 @@ struct User: Codable {
     var avatarNumber: Int
     
     init(uid: String, isAnonymous: Bool = true, username: String? = nil,
-         streakApp: Int = 0, streakAppBest: Int = 0, streakPost: Int = 0, streakPostBest: Int = 0, avatarNumber: Int = 0) {
+         streakApp: Int = 0, streakAppBest: Int = 0, streakPost: Int = 0, streakPostBest: Int = 0, avatarNumber: Int = 1) {
         
         let calendar = Calendar.current
         let components = DateComponents(year: 2000, month: 1, day: 1)

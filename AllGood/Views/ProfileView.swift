@@ -67,8 +67,8 @@ struct ProfileView: View {
                 }
             }
             .toolbar {
-                // Saved temporarily and commented -- helpful to Sign Out
-                // for User - sign-up flow testing
+//                 //Saved temporarily and commented -- helpful to Sign Out
+//                 // for User - sign-up flow testing
 //                ToolbarItem(placement: .navigationBarTrailing) {
 //                    Button("Sign Out") {
 //                        authViewModel.signOut()
@@ -227,7 +227,10 @@ struct ProfileView: View {
         ZStack {
             Color.black.opacity(0.3)
                 .ignoresSafeArea()
-                .onTapGesture { withAnimation { showUserSetupPopup = false } }
+                .onTapGesture {
+                    withAnimation { showUserSetupPopup = false }
+                    newUsername = ""
+                }
             
             VStack(spacing: 20) {
                 Text("Select Avatar")
@@ -258,13 +261,16 @@ struct ProfileView: View {
                     .foregroundColor(.gray)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
+                if (authViewModel.errorMessage != nil) {
+                    Text("Your username contains inappropriate language.")
+                        .font(.footnote)
+                        .foregroundColor(.gray)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
                 Button(action: {
                     Task {
                         await authViewModel.setupProfile(username: newUsername, avatarNumber: selectedIconNumber)
-                    }
-                    
-                    withAnimation {
-                        showUserSetupPopup = false
                     }
                 }) {
                     Text("Setup")

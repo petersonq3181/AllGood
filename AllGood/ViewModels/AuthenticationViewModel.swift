@@ -7,6 +7,7 @@ private var userListenerRegistration: ListenerRegistration?
 @MainActor
 class AuthenticationViewModel: ObservableObject {
     @Published var user: User? = nil
+    @Published var errorMessage: String?
     
     var hasValidUsername: Bool {
         guard let username = user?.username else { return false }
@@ -155,6 +156,14 @@ class AuthenticationViewModel: ObservableObject {
     
     func setupProfile(username: String, avatarNumber: Int) async {
         do {
+            let isAllowed = try await TextModerator.checkText(username)
+            
+            guard isAllowed else {
+                errorMessage = "Your username contains inappropriate language."
+                print("Failed to setup profile: the username contained inappropriate language.")
+                return
+            }
+            
             try await authManager.setupProfile(username: username, avatarNumber: avatarNumber)
         } catch {
             print("Failed to setup profile: \(error.localizedDescription)")

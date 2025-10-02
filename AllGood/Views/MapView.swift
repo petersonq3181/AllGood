@@ -19,12 +19,11 @@ struct MapView: View {
     @StateObject private var locationManager = LocationManager()
     @State private var showLocationDeniedAlert = false
     
-    @State private var showNewPostForm = false
-    
     @State private var showFilterForm = false
     @State private var selectedDateFilter: PostDateFilter = .all
     @State private var selectedTypeFilter: PostTypeFilter = .all
     
+    @State private var showNewPostForm = false
     @State private var selectedType: PostType? = nil
     @State private var message: String = ""
     @State private var canPost: Bool? = nil
@@ -413,12 +412,10 @@ struct MapView: View {
         switch locationManager.authorizationStatus {
         case .notDetermined:
             locationManager.requestAuthorization()
-            // locationManager.requestSingleLocation()
             
         case .authorizedWhenInUse, .authorizedAlways:
             locationManager.requestSingleLocation { loc in
                 guard let loc = loc else {
-                    // fallback (show alert, etc.)
                     return
                 }
                 
@@ -441,10 +438,8 @@ struct MapView: View {
                             locationString: locationString ?? "",
                             description: message
                         )
-                        if post == nil {
-                            // View can read postViewModel.errorMessage
-                            
-                        } else {
+                        
+                        if post != nil {
                             message = ""
                             selectedType = nil
                             withAnimation { showNewPostForm = false }

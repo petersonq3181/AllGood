@@ -15,13 +15,13 @@ class PostViewModel: ObservableObject {
     // posts for current user
     @Published var userPosts: [Post] = []
     
+    @Published var selectedPostDetails: Post?
+    @Published var worldPosts: [Post] = [] // filtered dataset
     @Published private(set) var allWorldPosts: [Post] = [] { // full dataset
         didSet {
             applyFilters()
         }
     }
-    @Published var worldPosts: [Post] = []            // filtered dataset
-    @Published var selectedPostDetails: Post?
     
     @Published var selectedDateFilter: PostDateFilter = .all
     @Published var selectedTypeFilter: PostTypeFilter = .all
@@ -68,7 +68,8 @@ class PostViewModel: ObservableObject {
             let isAllowed = try await TextModerator.checkText(description)
             
             guard isAllowed else {
-                throw PostError.inappropriateContent
+                errorMessage = "Your message contains inappropriate language."
+                return nil
             }
             
             let newPost = try await postManager.createPost(
@@ -147,20 +148,6 @@ class PostViewModel: ObservableObject {
             dateFilter: selectedDateFilter,
             typeFilter: selectedTypeFilter
         )
-    }
-}
-
-enum PostError: LocalizedError {
-    case inappropriateContent
-    case unknown(Error)
-    
-    var errorDescription: String? {
-        switch self {
-        case .inappropriateContent:
-            return "Your post contains inappropriate language."
-        case .unknown(let error):
-            return error.localizedDescription
-        }
     }
 }
 

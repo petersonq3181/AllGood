@@ -117,7 +117,7 @@ extension Post {
                  type: .donation,
                  location: GeoPoint(latitude: 33.2, longitude: -117.25),
                  locationString: "Capitol Hill, San Francisco, CA, United States",
-                 description: "A dollar donated at the grocery checkout at 3 PM on the day, despite the increased price in groceries, and even with the projection for higher inflation.")
+                 description: "A")
         ]
     }
 }

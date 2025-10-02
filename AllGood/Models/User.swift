@@ -57,12 +57,13 @@ struct User: Codable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        uid = try container.decode(String.self, forKey: .uid)
-        createdAt = (try? container.decode(Date.self, forKey: .createdAt)) ?? Date()
-        // provide safe defaults for older documents
+        
         let calendar = Calendar.current
         let components = DateComponents(year: 2000, month: 1, day: 1)
         let oldDate = calendar.date(from: components) ?? Date()
+        
+        uid = try container.decode(String.self, forKey: .uid)
+        createdAt = (try? container.decode(Date.self, forKey: .createdAt)) ?? Date()
         lastPost = (try? container.decode(Date.self, forKey: .lastPost)) ?? oldDate
         lastOpen = (try? container.decode(Date.self, forKey: .lastOpen)) ?? oldDate
         isAnonymous = (try? container.decode(Bool.self, forKey: .isAnonymous)) ?? true

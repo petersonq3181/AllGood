@@ -14,12 +14,10 @@ struct TextModerator {
     }
     
     static func checkText(_ text: String) async throws -> Bool {
-        // build URL
         guard let url = URL(string: Config.apiBaseURL) else {
             throw URLError(.badURL)
         }
         
-        // build request
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")

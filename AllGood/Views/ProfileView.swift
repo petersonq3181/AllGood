@@ -63,22 +63,24 @@ struct ProfileView: View {
                 }
             }
             .toolbar {
-                 //Saved temporarily and commented -- helpful to Sign Out
-                 // for User - sign-up flow testing
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Sign Out") {
-                        authViewModel.signOut()
-                    }
-                    .foregroundColor(.white) // optional to match your theme
-                }
+//                 //Saved temporarily and commented -- helpful to Sign Out
+//                 // for User - sign-up flow testing
 //                ToolbarItem(placement: .navigationBarTrailing) {
-//                    Button(action: {
-//                        showUserUpdatePopup = true
-//                    }) {
-//                        Image(systemName: "slider.horizontal.3")
-//                            .foregroundColor(.white) // keep theme color
+//                    Button("Sign Out") {
+//                        authViewModel.signOut()
 //                    }
+//                    .foregroundColor(.white) // optional to match your theme
 //                }
+                if authViewModel.hasValidUsername {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: {
+                            showUserUpdatePopup = true
+                        }) {
+                            Image(systemName: "slider.horizontal.3")
+                                .foregroundColor(.white) // keep theme color
+                        }
+                    }
+                }
             }
         }
         // attach this to the *content view* inside the tab
@@ -361,9 +363,9 @@ struct ProfileView: View {
     }
 }
 
-#Preview {
-    let mockAuthVM = MockAuthenticationViewModel()
-    let mockPostVM = MockPostViewModel()
-    ProfileView(postViewModel: mockPostVM)
-        .environmentObject(mockAuthVM as AuthenticationViewModel)
-}
+//#Preview {
+//    let mockAuthVM = MockAuthenticationViewModel()
+//    let mockPostVM = MockPostViewModel()
+//    ProfileView(postViewModel: mockPostVM)
+//        .environmentObject(mockAuthVM as AuthenticationViewModel)
+//}

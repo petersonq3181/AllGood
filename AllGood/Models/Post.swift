@@ -97,28 +97,28 @@ struct Post: Codable, Identifiable {
     }
 }
 
-// makes sure mock code is only included in debug builds (not production)
-#if DEBUG
-extension Post {
-    static var mockPosts: [Post] {
-        [
-            Post(id: "mock1",
-                 userId: "123",
-                 userName: "SuperLongUsernameLol",
-                 avatarNumber: 1,
-                 type: .donation,
-                 location: GeoPoint(latitude: 33.2, longitude: -117.25),
-                 locationString: "Capitol Hill, San Francisco, CA, United States",
-                 description: "A batch of chicken pot pie delivered across the county ..."),
-            Post(id: "mock2",
-                 userId: "123",
-                 userName: "anon",
-                 avatarNumber: 5,
-                 type: .donation,
-                 location: GeoPoint(latitude: 33.2, longitude: -117.25),
-                 locationString: "Capitol Hill, San Francisco, CA, United States",
-                 description: "A")
-        ]
-    }
-}
-#endif
+//// makes sure mock code is only included in debug builds (not production)
+//#if DEBUG
+//extension Post {
+//    static var mockPosts: [Post] {
+//        [
+//            Post(id: "mock1",
+//                 userId: "123",
+//                 userName: "SuperLongUsernameLol",
+//                 avatarNumber: 1,
+//                 type: .donation,
+//                 location: GeoPoint(latitude: 33.2, longitude: -117.25),
+//                 locationString: "Capitol Hill, San Francisco, CA, United States",
+//                 description: "A batch of chicken pot pie delivered across the county ..."),
+//            Post(id: "mock2",
+//                 userId: "123",
+//                 userName: "anon",
+//                 avatarNumber: 5,
+//                 type: .donation,
+//                 location: GeoPoint(latitude: 33.2, longitude: -117.25),
+//                 locationString: "Capitol Hill, San Francisco, CA, United States",
+//                 description: "A")
+//        ]
+//    }
+//}
+//#endif

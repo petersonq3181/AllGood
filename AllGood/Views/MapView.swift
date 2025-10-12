@@ -358,21 +358,24 @@ struct MapView: View {
     
     private var messageField: some View {
         ZStack(alignment: .topLeading) {
+            TextEditor(text: $message)
+                .padding(12)
+            
             if message.isEmpty {
                 Text("Message..")
                     .foregroundColor(.gray)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 20)
+                    .allowsHitTesting(false)
             }
-            TextEditor(text: $message)
-                .padding(12)
-                .opacity(message.isEmpty ? 0.01 : 1)
         }
         .frame(height: 100)
         .background(Color.white)
         .cornerRadius(12)
-        .overlay(RoundedRectangle(cornerRadius: 12)
-            .stroke(Color.gray, lineWidth: 1))
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.gray, lineWidth: 1)
+        )
     }
         
     private var postLocationNote: some View {

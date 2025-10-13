@@ -459,9 +459,11 @@ struct MapView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let mockAuthVM = MockAuthenticationViewModel()
     let mockPostVM = MockPostViewModel()
     MapView(postViewModel: mockPostVM)
         .environmentObject(mockAuthVM)
 }
+#endif

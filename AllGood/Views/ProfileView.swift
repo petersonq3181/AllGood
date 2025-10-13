@@ -361,9 +361,11 @@ struct ProfileView: View {
     }
 }
 
+#if DEBUG 
 #Preview {
     let mockAuthVM = MockAuthenticationViewModel()
     let mockPostVM = MockPostViewModel()
     ProfileView(postViewModel: mockPostVM)
         .environmentObject(mockAuthVM as AuthenticationViewModel)
 }
+#endif

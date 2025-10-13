@@ -64,8 +64,10 @@ struct RootView: View {
     }
 }
 
+#if DEBUG
 #Preview {
     let authViewModel = AuthenticationViewModel()
     RootView()
         .environmentObject(authViewModel)
 }
+#endif

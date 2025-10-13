@@ -91,12 +91,12 @@ struct User: Codable {
     }
 }
 
-//// makes sure mock code is only included in debug builds (not production)
-//#if DEBUG
-//extension User {
-//    static var mock: User {
-//        User(uid: "123", isAnonymous: false, username: "",
-//             streakApp: 1, streakAppBest: 1, streakPost: 0, streakPostBest: 0, avatarNumber: 0)
-//    }
-//}
-//#endif
+// makes sure mock code is only included in debug builds (not production)
+#if DEBUG
+extension User {
+    static var mock: User {
+        User(uid: "123", isAnonymous: false, username: "",
+             streakApp: 1, streakAppBest: 1, streakPost: 0, streakPostBest: 0, avatarNumber: 0)
+    }
+}
+#endif

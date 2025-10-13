@@ -71,7 +71,9 @@ struct MockPostPopup: View {
     }
 }
 
-//#Preview {
-//    let mock = Post.mockPosts.first!
-//    MockPostPopup(details: mock)
-//}
+#if DEBUG
+#Preview {
+    let mock = Post.mockPosts.first!
+    MockPostPopup(details: mock)
+}
+#endif

@@ -71,6 +71,7 @@ struct ProfileView: View {
 //                    }
 //                    .foregroundColor(.white) // optional to match your theme
 //                }
+<<<<<<< HEAD
                 if authViewModel.hasValidUsername {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button(action: {
@@ -79,6 +80,14 @@ struct ProfileView: View {
                             Image(systemName: "slider.horizontal.3")
                                 .foregroundColor(.white) // keep theme color
                         }
+=======
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showUserUpdatePopup = true
+                    }) {
+                        Image(systemName: "slider.horizontal.3")
+                            .foregroundColor(.white) // keep theme color
+>>>>>>> origin/main
                     }
                 }
             }
@@ -363,9 +372,11 @@ struct ProfileView: View {
     }
 }
 
-//#Preview {
-//    let mockAuthVM = MockAuthenticationViewModel()
-//    let mockPostVM = MockPostViewModel()
-//    ProfileView(postViewModel: mockPostVM)
-//        .environmentObject(mockAuthVM as AuthenticationViewModel)
-//}
+#if DEBUG 
+#Preview {
+    let mockAuthVM = MockAuthenticationViewModel()
+    let mockPostVM = MockPostViewModel()
+    ProfileView(postViewModel: mockPostVM)
+        .environmentObject(mockAuthVM as AuthenticationViewModel)
+}
+#endif

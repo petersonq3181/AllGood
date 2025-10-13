@@ -179,16 +179,16 @@ class AuthenticationViewModel: ObservableObject {
     }
 }
 
-//#if DEBUG
-//@MainActor
-//final class MockAuthenticationViewModel: AuthenticationViewModel {
-//    init(mockUser: User = .mock) {
-//        super.init()
-//        self.user = mockUser
-//    }
-//
-//    // prevent hitting Firebase in previews/tests
-//    override func loadCurrentUser() async { }
-//    override func signOut() { self.user = nil }
-//}
-//#endif
+#if DEBUG
+@MainActor
+final class MockAuthenticationViewModel: AuthenticationViewModel {
+    init(mockUser: User = .mock) {
+        super.init()
+        self.user = mockUser
+    }
+
+    // prevent hitting Firebase in previews/tests
+    override func loadCurrentUser() async { }
+    override func signOut() { self.user = nil }
+}
+#endif

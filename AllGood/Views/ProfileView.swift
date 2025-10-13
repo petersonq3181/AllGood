@@ -63,31 +63,20 @@ struct ProfileView: View {
                 }
             }
             .toolbar {
-//                 //Saved temporarily and commented -- helpful to Sign Out
-//                 // for User - sign-up flow testing
-//                ToolbarItem(placement: .navigationBarTrailing) {
-//                    Button("Sign Out") {
-//                        authViewModel.signOut()
-//                    }
-//                    .foregroundColor(.white) // optional to match your theme
-//                }
-<<<<<<< HEAD
-                if authViewModel.hasValidUsername {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(action: {
-                            showUserUpdatePopup = true
-                        }) {
-                            Image(systemName: "slider.horizontal.3")
-                                .foregroundColor(.white) // keep theme color
-                        }
-=======
+                //                 //Saved temporarily and commented -- helpful to Sign Out
+                //                 // for User - sign-up flow testing
+                //                ToolbarItem(placement: .navigationBarTrailing) {
+                //                    Button("Sign Out") {
+                //                        authViewModel.signOut()
+                //                    }
+                //                    .foregroundColor(.white) // optional to match your theme
+                //                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {
                         showUserUpdatePopup = true
                     }) {
                         Image(systemName: "slider.horizontal.3")
                             .foregroundColor(.white) // keep theme color
->>>>>>> origin/main
                     }
                 }
             }

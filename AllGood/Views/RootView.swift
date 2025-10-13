@@ -12,6 +12,8 @@ struct RootView: View {
 
     @EnvironmentObject var authViewModel: AuthenticationViewModel
     
+    @State private var isSpinning = false
+    
     private let theme = ColorThemeA()
     
     var body: some View {
@@ -42,7 +44,21 @@ struct RootView: View {
                 }
                 .tint(.white) // sets the selected tab color
             } else {
-                ProgressView("Loading user..")
+                VStack(spacing: 16) {
+                    Image("CustomIcon4")
+                        .rotationEffect(.degrees(isSpinning ? 360 : 0))
+                        .animation(
+                            Animation.linear(duration: 2)
+                                .repeatForever(autoreverses: false),
+                            value: isSpinning
+                        )
+                    Text("Loading…")
+                        .font(.headline)
+                        .foregroundColor(.gray)
+                }
+                .onAppear {
+                    isSpinning = true
+                }
             }
         }
     }

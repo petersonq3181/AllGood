@@ -119,10 +119,12 @@ struct MapView: View {
                         Text(formatted)
                             .font(.title2)
                             .fontWeight(.bold)
+                            .foregroundColor(.black)
                     }
                     
                     Text(details.timestamp.formatted(date: .long, time: .omitted))
                         .font(.body)
+                        .foregroundColor(.black)
 
                     Text(details.type.displayName)
                         .font(.body)
@@ -130,6 +132,7 @@ struct MapView: View {
 
                     Text(details.description)
                         .font(.body)
+                        .foregroundColor(.black)
                         .multilineTextAlignment(.leading)
                         .lineLimit(6)
                         .truncationMode(.tail)
@@ -140,7 +143,7 @@ struct MapView: View {
                     HStack(spacing: 6) {
                         Text("Post from @\(details.userName)")
                             .font(.body)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.black)
                             .lineLimit(2)
                             .truncationMode(.tail)
                         
@@ -360,6 +363,7 @@ struct MapView: View {
         ZStack(alignment: .topLeading) {
             TextEditor(text: $message)
                 .padding(12)
+                .background(Color.clear)
             
             if message.isEmpty {
                 Text("Message..")
@@ -370,7 +374,7 @@ struct MapView: View {
             }
         }
         .frame(height: 100)
-        .background(Color.white)
+        .background(Color(UIColor.systemBackground)) // adaptive background
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)

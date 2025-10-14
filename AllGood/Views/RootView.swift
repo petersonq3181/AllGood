@@ -13,12 +13,13 @@ struct RootView: View {
     @EnvironmentObject var authViewModel: AuthenticationViewModel
     
     @State private var isSpinning = false
-    
+    @State private var minimumDelayPassed = false
+
     private let theme = ColorThemeA()
     
     var body: some View {
         Group {
-            if let user = authViewModel.user {
+            if let user = authViewModel.user, minimumDelayPassed {
                 TabView {
                     MapView(postViewModel: postViewModel)
                         .environment(\.colorTheme, theme)
@@ -58,9 +59,15 @@ struct RootView: View {
                 }
                 .onAppear {
                     isSpinning = true
+                    Task {
+                        let spinDuration = Double.random(in: 1...2)
+                        try? await Task.sleep(nanoseconds: UInt64(spinDuration * 1_000_000_000))
+                        minimumDelayPassed = true
+                    }
                 }
             }
         }
+        .animation(.easeInOut(duration: 0.3), value: minimumDelayPassed)
     }
 }
 

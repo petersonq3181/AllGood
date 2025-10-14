@@ -363,6 +363,7 @@ struct MapView: View {
         ZStack(alignment: .topLeading) {
             TextEditor(text: $message)
                 .padding(12)
+                .background(Color.clear)
             
             if message.isEmpty {
                 Text("Message..")
@@ -373,7 +374,7 @@ struct MapView: View {
             }
         }
         .frame(height: 100)
-        .background(Color.white)
+        .background(Color(UIColor.systemBackground)) // adaptive background
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)

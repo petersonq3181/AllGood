@@ -31,6 +31,7 @@ struct MapView: View {
         selectedType != nil &&
         !message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
+    @State private var isPosting = false
     
     var isUserSetup: Bool {
         authViewModel.hasValidUsername
@@ -397,32 +398,44 @@ struct MapView: View {
             .multilineTextAlignment(.center)
             .padding(.horizontal)
     }
-        
+    
     private var postButton: some View {
         Button(action: handlePostButton) {
-            Text("Post")
-                .fontWeight(.semibold)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(isPostFormValid ? theme.primary : Color.gray.opacity(0.5))
-                .foregroundColor(.white)
-                .cornerRadius(25)
+            if isPosting {
+                ProgressView()
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(theme.primary)
+                    .foregroundColor(.white)
+                    .cornerRadius(25)
+            } else {
+                Text("Post")
+                    .fontWeight(.semibold)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(isPostFormValid ? theme.primary : Color.gray.opacity(0.5))
+                    .foregroundColor(.white)
+                    .cornerRadius(25)
+            }
         }
         .padding(.top, 4)
         .frame(maxWidth: 160)
-        .disabled(!isPostFormValid)
+        .disabled(!isPostFormValid || isPosting)
     }
         
     private func handlePostButton() {
-        guard isPostFormValid else { return }
+        guard isPostFormValid, !isPosting else { return }
+        isPosting = true
         
         switch locationManager.authorizationStatus {
         case .notDetermined:
             locationManager.requestAuthorization()
+            isPosting = false
             
         case .authorizedWhenInUse, .authorizedAlways:
             locationManager.requestSingleLocation { loc in
                 guard let loc = loc else {
+                    isPosting = false
                     return
                 }
                 
@@ -451,14 +464,17 @@ struct MapView: View {
                             selectedType = nil
                             withAnimation { showNewPostForm = false }
                         }
+                        
+                        isPosting = false
                     }
                 }
             }
             
         case .denied, .restricted, .none:
             showLocationDeniedAlert = true
+            isPosting = false
         @unknown default:
-            break
+            isPosting = false 
         }
     }
 }
